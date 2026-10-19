@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DinoCars.Domain;
 
 namespace DinoCars.AppLogic
 {
-    internal interface ICustomerRepository
+    public interface ICustomerRepository
     {
+        Task<Customer?> FindByPhoneAsync(string phone, CancellationToken cancellationToken = default);
+        void Add(Customer customer);
     }
 }

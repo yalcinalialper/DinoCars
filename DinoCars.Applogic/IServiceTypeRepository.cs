@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DinoCars.Domain;
 
 namespace DinoCars.AppLogic
 {
-    internal interface IServiceTypeRepository
+    public interface IServiceTypeRepository
     {
+        Task<IReadOnlyList<ServiceType>> GetActiveAsync(CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<ServiceType>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
     }
 }

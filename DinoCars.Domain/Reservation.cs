@@ -86,9 +86,11 @@ namespace DinoCars.Domain
         public void Cancel() =>
             TransitionTo(ReservationStatus.Cancelled, ReservationStatus.Requested, ReservationStatus.Approved);
 
+        public static readonly IReadOnlyCollection<ReservationStatus> CapacityBlockingStatuses =
+            [ReservationStatus.Requested, ReservationStatus.Approved, ReservationStatus.Completed];
+
         /// <summary>Does this reservation take up workshop capacity?</summary>
-        public bool BlocksCapacity =>
-            Status is ReservationStatus.Requested or ReservationStatus.Approved or ReservationStatus.Completed;
+        public bool BlocksCapacity => CapacityBlockingStatuses.Contains(Status);
 
         public bool Overlaps(DateTime startUtc, DateTime endUtc) =>
             startUtc < EndUtc && endUtc > StartUtc;
