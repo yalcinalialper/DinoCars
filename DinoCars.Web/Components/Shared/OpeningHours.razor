@@ -1,0 +1,33 @@
+﻿@using System.Globalization
+@using DinoCars.AppLogic.Availability
+@using Microsoft.Extensions.Options
+@inject IOptions<WorkshopOptions> WorkshopOptions
+
+<table class="opening-hours">
+    @foreach (var day in Week)
+    {
+        <tr>
+            <th>@Dutch.DateTimeFormat.GetDayName(day)</th>
+            <td>
+                @if (WorkshopOptions.Value.OpeningHours.TryGetValue(day, out var hours))
+                {
+                    @hours.Open.ToString("HH:mm")<text> – </text>@hours.Close.ToString("HH:mm")
+                }
+                else
+                {
+                    <span class="closed">Gesloten</span>
+                }
+            </td>
+        </tr>
+    }
+</table>
+
+@code {
+    private static readonly CultureInfo Dutch = new("nl-BE");
+
+    private static readonly DayOfWeek[] Week =
+    [
+        DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday,
+        DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday
+    ];
+}

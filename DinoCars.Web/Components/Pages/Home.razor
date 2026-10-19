@@ -1,7 +1,75 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Dino Cars – Uw garage in Alken</PageTitle>
 
-<h1>Hello, world!</h1>
+<section class="hero">
+    <div class="container">
+        <p class="eyebrow">Garage in Alken</p>
+        <h1>Uw auto in<br /><span>goede handen!</span></h1>
+        <p class="lead">Onderhoud, herstellingen, banden, airco en meer. Vakkundig, eerlijk en betaalbaar.</p>
+        <div class="hero-actions">
+            <a href="afspraak" class="btn btn-yellow">Maak een afspraak</a>
+            <a href="tel:+32491888824" class="btn btn-outline">Bel ons</a>
+        </div>
+    </div>
+</section>
 
-Welcome to your new app.
+<section id="diensten" class="section">
+    <div class="container">
+        <h2>Onze diensten</h2>
+        <div class="services">
+            @foreach (var (title, text) in Services)
+            {
+                <article class="service">
+                    <h3>@title</h3>
+                    <p>@text</p>
+                </article>
+            }
+        </div>
+        <div class="center">
+            <a href="afspraak" class="btn btn-yellow">Plan uw afspraak online</a>
+        </div>
+    </div>
+</section>
+
+<section class="section dark">
+    <div class="container values">
+        <div>
+            <h3>Betrouwbaar</h3>
+            <p>Eerlijk advies, zonder verrassingen achteraf.</p>
+        </div>
+        <div>
+            <h3>Transparant</h3>
+            <p>U weet waar u aan toe bent voor we beginnen.</p>
+        </div>
+        <div>
+            <h3>Betaalbaar</h3>
+            <p>Kwaliteit aan een eerlijke prijs.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container cta-band">
+        <div>
+            <h2>Liever even bellen?</h2>
+            <p>Bel ons op <a href="tel:+32491888824">+32 491 88 88 24</a> of stuur een bericht via WhatsApp.</p>
+        </div>
+        <OpeningHours />
+    </div>
+</section>
+
+@code {
+    private static readonly (string Title, string Text)[] Services =
+    [
+        ("Onderhoud & herstelling", "Periodiek onderhoud volgens de voorschriften van uw wagen, en herstellingen van klein tot groot."),
+        ("Olie verversen", "Verse motorolie en een nieuwe filter, zodat uw motor langer meegaat."),
+        ("Airco invullen", "Bijvullen met R1234yf of R134a, voor zowel nieuwe als oudere wagens."),
+        ("Diagnose", "Een lampje op uw dashboard? Wij lezen uw wagen uit en zoeken de oorzaak."),
+        ("Remmen", "Controle en vervanging van remblokken en remschijven."),
+        ("Banden & velgen", "Banden wisselen, balanceren en de seizoenswissel."),
+        ("Autoruiten", "Herstel van sterrebreuken en vervanging van voorruiten."),
+        ("Auto poleren", "Diepe glans en een beschermende laag voor uw lak."),
+        ("Auto's kopen & verkopen", "Op zoek naar een wagen, of wilt u de uwe verkopen? Neem gerust contact op.")
+    ];
+}

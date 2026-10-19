@@ -1,0 +1,19 @@
+﻿.opening-hours {
+    border-collapse: collapse;
+}
+
+    .opening-hours th {
+        text-align: left;
+        font-weight: 600;
+        padding: .15rem 1.25rem .15rem 0;
+        text-transform: capitalize;
+    }
+
+    .opening-hours td {
+        padding: .15rem 0;
+    }
+
+.closed {
+    color: #ff6b6b;
+    font-weight: 700;
+}
