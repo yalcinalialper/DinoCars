@@ -2,6 +2,7 @@
 {
     public sealed class ServiceType
     {
+        public const string OtherCode = "OTHER";
         public Guid Id { get; private set; }
         public string Code { get; private set; } = null!;
         public string Name { get; private set; } = null!;
