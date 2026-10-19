@@ -1,5 +1,4 @@
-﻿using DinoCars.Applogic;
-using DinoCars.AppLogic;
+﻿using DinoCars.AppLogic;
 using DinoCars.Infrastructure.Data;
 using DinoCars.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;

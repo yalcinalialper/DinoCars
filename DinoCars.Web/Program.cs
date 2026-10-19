@@ -1,10 +1,12 @@
+using DinoCars.AppLogic;
+using DinoCars.AppLogic.Availability;
+using DinoCars.Infrastructure;
+using DinoCars.Infrastructure.Data;
+using DinoCars.Infrastructure.Identity;
 using DinoCars.Web.Components;
 using DinoCars.Web.Components.Account;
-using DinoCars.Infrastructure.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using DinoCars.Infrastructure.Data;
-using DinoCars.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,8 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.Configure<WorkshopOptions>(builder.Configuration.GetSection(WorkshopOptions.SectionName));
+builder.Services.AddApplogic();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>

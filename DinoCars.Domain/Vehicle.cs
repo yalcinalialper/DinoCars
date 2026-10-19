@@ -20,9 +20,12 @@
             CustomerId = customerId;
             Make = make.Trim();
             Model = model.Trim();
-            LicensePlate = licensePlate.Trim().ToUpperInvariant();
+            LicensePlate = NormalizeLicensePlate(licensePlate);
             Vin = NormalizeVin(vin);
         }
+
+        internal static string NormalizeLicensePlate(string licensePlate) =>
+        licensePlate.Trim().ToUpperInvariant();
 
         private static string? NormalizeVin(string? vin)
         {

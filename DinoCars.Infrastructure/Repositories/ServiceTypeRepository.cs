@@ -2,9 +2,6 @@
 using DinoCars.Domain;
 using DinoCars.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DinoCars.Infrastructure.Repositories
 {

@@ -1,4 +1,4 @@
-﻿namespace DinoCars.Applogic
+﻿namespace DinoCars.AppLogic
 {
     public interface IClock
     {
