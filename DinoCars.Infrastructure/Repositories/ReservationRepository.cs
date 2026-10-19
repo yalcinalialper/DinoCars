@@ -1,5 +1,6 @@
 ﻿using DinoCars.AppLogic;
 using DinoCars.Domain;
+using DinoCars.Domain.Enums;
 using DinoCars.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ namespace DinoCars.Infrastructure.Repositories
     {
         private IQueryable<Reservation> WithDetails =>
             context.Reservations
-                .Include(r => r.Vehicle)
+                .Include(r => r.Vehicle).ThenInclude(v => v.Customer)
                 .Include(r => r.Services).ThenInclude(s => s.ServiceType);
 
         public Task<Reservation?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
@@ -26,10 +27,19 @@ namespace DinoCars.Infrastructure.Repositories
                 .Where(r => r.StartUtc < toUtc && r.EndUtc > fromUtc)
                 .ToListAsync(cancellationToken);
 
-        public async Task<IReadOnlyList<Reservation>> GetUpcomingAsync(DateTime fromUtc, CancellationToken cancellationToken = default) =>
+        public async Task<IReadOnlyList<Reservation>> GetInRangeAsync(
+            DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken = default) =>
             await WithDetails
                 .AsNoTracking()
-                .Where(r => r.EndUtc >= fromUtc)
+                .Where(r => r.StartUtc < toUtc && r.EndUtc > fromUtc)
+                .OrderBy(r => r.StartUtc)
+                .ToListAsync(cancellationToken);
+
+        public async Task<IReadOnlyList<Reservation>> GetByStatusAsync(
+            ReservationStatus status, DateTime fromUtc, CancellationToken cancellationToken = default) =>
+            await WithDetails
+                .AsNoTracking()
+                .Where(r => r.Status == status && r.EndUtc >= fromUtc)
                 .OrderBy(r => r.StartUtc)
                 .ToListAsync(cancellationToken);
 

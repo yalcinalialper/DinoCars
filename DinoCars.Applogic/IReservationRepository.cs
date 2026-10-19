@@ -1,4 +1,5 @@
 ﻿using DinoCars.Domain;
+using DinoCars.Domain.Enums;
 
 namespace DinoCars.AppLogic
 {
@@ -9,7 +10,11 @@ namespace DinoCars.AppLogic
 
         Task<IReadOnlyList<Reservation>> GetBlockingInRangeAsync(DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<Reservation>> GetUpcomingAsync(DateTime fromUtc, CancellationToken cancellationToken = default);
+
+        /// <summary>All reservations overlapping the period, any status, with customer, vehicle and services.</summary>
+        Task<IReadOnlyList<Reservation>> GetInRangeAsync(DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<Reservation>> GetByStatusAsync(ReservationStatus status, DateTime fromUtc, CancellationToken cancellationToken = default);
 
         void Add(Reservation reservation);
     }
