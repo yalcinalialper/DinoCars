@@ -1,12 +1,12 @@
 ﻿@page "/afspraak"
 @rendermode InteractiveServer
+@inherits ScopedComponentBase
 @using DinoCars.AppLogic
 @using DinoCars.AppLogic.Availability
 @using DinoCars.AppLogic.Reservations
 @using DinoCars.Domain
 @using DinoCars.Domain.Exceptions
 @using Microsoft.Extensions.Options
-@inject IServiceScopeFactory ScopeFactory
 @inject IClock Clock
 @inject IOptions<WorkshopOptions> WorkshopOptions
 @inject NavigationManager Navigation
@@ -250,12 +250,4 @@
         }
     }
 
-    // A fresh scope (and so a fresh DbContext) per action. See the explanation above.
-    private async Task<TResult> RunScopedAsync<TService, TResult>(Func<TService, Task<TResult>> action)
-        where TService : notnull
-    {
-        await using var scope = ScopeFactory.CreateAsyncScope();
-        var service = scope.ServiceProvider.GetRequiredService<TService>();
-        return await action(service);
-    }
 }

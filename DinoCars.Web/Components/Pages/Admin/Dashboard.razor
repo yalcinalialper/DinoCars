@@ -1,0 +1,152 @@
+﻿@page "/beheer"
+@rendermode InteractiveServer
+@inherits ScopedComponentBase
+@attribute [Authorize(Roles = AppRoles.Staff)]
+@using System.Globalization
+@using DinoCars.AppLogic
+@using DinoCars.AppLogic.Availability
+@using DinoCars.AppLogic.Reservations.Admin
+@using DinoCars.Domain.Exceptions
+@using DinoCars.Infrastructure.Identity
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Options
+@inject IClock Clock
+@inject IOptions<WorkshopOptions> WorkshopOptions
+@inject IJSRuntime JS
+
+<PageTitle>Beheer – Dino Cars</PageTitle>
+
+<section class="admin container">
+    <div class="title-row">
+        <h1>Beheer</h1>
+        <button class="refresh" disabled="@_busy" @onclick="LoadAsync">Vernieuwen</button>
+    </div>
+
+    @if (_error is not null)
+    {
+        <div class="error">@_error</div>
+    }
+
+    <div class="panel">
+        <h2>Nieuwe aanvragen <span class="count">@_pending.Count</span></h2>
+
+        @if (_pending.Count == 0)
+        {
+            <p class="hint">Geen openstaande aanvragen.</p>
+        }
+        else
+        {
+            @foreach (var reservation in _pending)
+            {
+                <ReservationCard Reservation="reservation" Disabled="_busy"
+                                 OnAction="action => HandleAsync(reservation, action)" />
+            }
+        }
+    </div>
+
+    <div class="panel">
+        <div class="day-nav">
+            <button disabled="@_busy" @onclick="() => ChangeDayAsync(-1)" aria-label="Vorige dag">‹</button>
+            <h2>@_day.ToString("dddd d MMMM", Dutch)</h2>
+            <button disabled="@_busy" @onclick="() => ChangeDayAsync(1)" aria-label="Volgende dag">›</button>
+            @if (_day != _today)
+            {
+                <button class="today" disabled="@_busy" @onclick="() => ChangeDayAsync(_today.DayNumber - _day.DayNumber)">Vandaag</button>
+            }
+        </div>
+
+        @if (_dayReservations.Count == 0)
+        {
+            <p class="hint">Geen afspraken op deze dag.</p>
+        }
+        else
+        {
+            @foreach (var reservation in _dayReservations)
+            {
+                <ReservationCard Reservation="reservation" Disabled="_busy"
+                                 OnAction="action => HandleAsync(reservation, action)" />
+            }
+        }
+    </div>
+</section>
+
+@code {
+    private static readonly CultureInfo Dutch = new("nl-BE");
+
+    private IReadOnlyList<ReservationOverview> _pending = [];
+    private IReadOnlyList<ReservationOverview> _dayReservations = [];
+    private DateOnly _today;
+    private DateOnly _day;
+    private bool _busy;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(WorkshopOptions.Value.TimeZoneId);
+        _today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(Clock.UtcNow, timeZone));
+        _day = _today;
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _busy = true;
+        try
+        {
+            await RunScopedAsync<IReservationAdminService>(async admin =>
+            {
+                _pending = await admin.GetPendingAsync();
+                _dayReservations = await admin.GetForDayAsync(_day);
+            });
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task ChangeDayAsync(int days)
+    {
+        _day = _day.AddDays(days);
+        await LoadAsync();
+    }
+
+    private async Task HandleAsync(ReservationOverview reservation, ReservationAction action)
+    {
+        // Ask for confirmation on actions that are hard to undo.
+        var question = action switch
+        {
+            ReservationAction.Reject => $"Aanvraag van {reservation.CustomerName} weigeren?",
+            ReservationAction.Cancel => $"Afspraak van {reservation.CustomerName} annuleren?",
+            _ => null
+        };
+
+        if (question is not null && !await JS.InvokeAsync<bool>("confirm", question))
+            return;
+
+        _error = null;
+        _busy = true;
+        try
+        {
+            await RunScopedAsync<IReservationAdminService>(admin => action switch
+            {
+                ReservationAction.Approve => admin.ApproveAsync(reservation.Id),
+                ReservationAction.Reject => admin.RejectAsync(reservation.Id),
+                ReservationAction.Cancel => admin.CancelAsync(reservation.Id),
+                ReservationAction.Complete => admin.CompleteAsync(reservation.Id),
+                _ => throw new ArgumentOutOfRangeException(nameof(action))
+            });
+        }
+        catch (DomainException ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _busy = false;
+        }
+
+        await LoadAsync();
+    }
+}

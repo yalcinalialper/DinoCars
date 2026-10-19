@@ -1,0 +1,93 @@
+﻿.card {
+    background: #fff;
+    border-radius: 8px;
+    border-left: 6px solid #ccc;
+    padding: 1rem 1.25rem;
+    margin-bottom: .75rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+}
+
+.status-requested {
+    border-left-color: var(--yellow);
+}
+
+.status-approved {
+    border-left-color: #2e9e4f;
+}
+
+.status-completed {
+    border-left-color: #555;
+    opacity: .75;
+}
+
+.status-rejected, .status-cancelled {
+    border-left-color: #c0392b;
+    opacity: .6;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: .6rem;
+}
+
+.badge {
+    background: var(--black);
+    color: #fff;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: .75rem;
+    font-size: .95rem;
+}
+
+.plate {
+    font-family: monospace;
+    font-weight: 700;
+    background: #f1f1f1;
+    border: 1px solid #ccc;
+    padding: 0 .35rem;
+    border-radius: 3px;
+}
+
+.notes {
+    margin: .75rem 0 0;
+    padding: .5rem .75rem;
+    background: #fff8db;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+footer {
+    display: flex;
+    gap: .5rem;
+    margin-top: .9rem;
+}
+
+    footer button {
+        padding: .5rem 1.1rem;
+        border-radius: 6px;
+        border: 2px solid var(--black);
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        footer button:disabled {
+            opacity: .5;
+            cursor: default;
+        }
+
+.approve {
+    background: var(--yellow);
+}
+
+.reject {
+    background: #fff;
+}
