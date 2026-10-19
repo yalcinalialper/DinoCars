@@ -1,6 +1,6 @@
 using DinoCars.Web.Components.Account.Pages;
 using DinoCars.Web.Components.Account.Pages.Manage;
-using DinoCars.Web.Data;
+using DinoCars.Infrastructure.Identity;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
