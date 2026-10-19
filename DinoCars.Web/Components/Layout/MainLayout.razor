@@ -1,23 +1,64 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="/" class="logo">DINO <span>CARS</span></a>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <nav class="main-nav">
+            <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
+            <a href="/#diensten">Diensten</a>
+            <a href="/#contact">Contact</a>
+
+            <AuthorizeView>
+                <Authorized>
+                    <form action="Account/Logout" method="post" class="logout">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="" />
+                        <button type="submit">Uitloggen</button>
+                    </form>
+                </Authorized>
+            </AuthorizeView>
+
+            <NavLink href="afspraak" class="nav-cta">Afspraak maken</NavLink>
+        </nav>
+    </div>
+</header>
+
+<main>
+    @Body
+</main>
+
+<footer class="site-footer" id="contact">
+    <div class="container footer-grid">
+        <div>
+            <div class="logo">DINO <span>CARS</span></div>
+            <p>Uw auto in goede handen!</p>
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <div>
+            <h3>Contact</h3>
+            <p>
+                <a href="tel:+32491888824">+32 491 88 88 24</a><br />
+                <a href="mailto:hawar.dino@gmail.com">hawar.dino@gmail.com</a><br />
+                @* TODO: confirm house number with Dino (posters say both 1227 and 1224) *@
+                <a href="https://www.google.com/maps/search/?api=1&query=Kolmenstraat+1227+3570+Alken"
+                   target="_blank" rel="noopener">Kolmenstraat 1227, 3570 Alken</a>
+            </p>
+        </div>
+
+        <div>
+            <h3>Openingsuren</h3>
+            <OpeningHours />
+        </div>
+    </div>
+
+    <div class="container footer-bottom">
+        © @DateTime.Now.Year Dino Cars · <a href="Account/Login">Login personeel</a>
+    </div>
+</footer>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
+    Er is een onverwachte fout opgetreden.
+    <a href="." class="reload">Herladen</a>
     <span class="dismiss">🗙</span>
 </div>
