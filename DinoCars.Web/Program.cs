@@ -1,9 +1,10 @@
 using DinoCars.Web.Components;
 using DinoCars.Web.Components.Account;
-using DinoCars.Web.Data;
+using DinoCars.Infrastructure.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using DinoCars.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

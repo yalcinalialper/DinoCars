@@ -1,4 +1,4 @@
-using DinoCars.Web.Data;
+using DinoCars.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
