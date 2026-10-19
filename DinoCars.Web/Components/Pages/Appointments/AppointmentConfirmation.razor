@@ -1,0 +1,68 @@
+﻿@page "/afspraak/{Token}"
+@using System.Globalization
+@using DinoCars.AppLogic
+@using DinoCars.AppLogic.Availability
+@using DinoCars.Domain
+@using DinoCars.Domain.Enums
+@using Microsoft.Extensions.Options
+@inject IReservationRepository Reservations
+@inject IOptions<WorkshopOptions> WorkshopOptions
+
+<PageTitle>Uw afspraak – Dino Cars</PageTitle>
+
+<section class="confirmation">
+    @if (_reservation is null)
+    {
+        <h1>Afspraak niet gevonden</h1>
+        <p>Deze link is ongeldig of de afspraak bestaat niet meer.</p>
+    }
+    else
+    {
+        <h1>Bedankt, uw aanvraag is ontvangen!</h1>
+        <p class="status">Status: <strong>@StatusText(_reservation.Status)</strong></p>
+
+        <dl>
+            <dt>Datum</dt>
+            <dd>@ToLocal(_reservation.StartUtc).ToString("dddd d MMMM yyyy", Dutch)</dd>
+
+            <dt>Uur</dt>
+            <dd>@ToLocal(_reservation.StartUtc).ToString("HH:mm") – @ToLocal(_reservation.EndUtc).ToString("HH:mm")</dd>
+
+            <dt>Voertuig</dt>
+            <dd>@_reservation.Vehicle.Make @_reservation.Vehicle.Model (@_reservation.Vehicle.LicensePlate)</dd>
+
+            <dt>Diensten</dt>
+            <dd>@string.Join(", ", _reservation.Services.Select(s => s.ServiceType.Name))</dd>
+        </dl>
+
+        <p class="hint">Bewaar deze pagina: via deze link kunt u uw afspraak altijd terugvinden.</p>
+        <p class="hint">Vragen? Bel ons op +32 491 88 88 24.</p>
+    }
+</section>
+
+@code {
+    private static readonly CultureInfo Dutch = new("nl-BE");
+
+    [Parameter] public string Token { get; set; } = "";
+
+    private Reservation? _reservation;
+    private TimeZoneInfo _timeZone = TimeZoneInfo.Utc;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _timeZone = TimeZoneInfo.FindSystemTimeZoneById(WorkshopOptions.Value.TimeZoneId);
+        _reservation = await Reservations.GetByAccessTokenAsync(Token);
+    }
+
+    private DateTime ToLocal(DateTime utc) => TimeZoneInfo.ConvertTimeFromUtc(utc, _timeZone);
+
+    private static string StatusText(ReservationStatus status) => status switch
+    {
+        ReservationStatus.Requested => "Aangevraagd, wacht op bevestiging",
+        ReservationStatus.Approved => "Bevestigd",
+        ReservationStatus.Rejected => "Niet mogelijk, neem contact met ons op",
+        ReservationStatus.Cancelled => "Geannuleerd",
+        ReservationStatus.Completed => "Afgerond",
+        _ => status.ToString()
+    };
+}

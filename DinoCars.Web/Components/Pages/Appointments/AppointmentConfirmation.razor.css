@@ -1,0 +1,35 @@
+﻿.confirmation {
+    max-width: 640px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    border-top: 6px solid #ffc400;
+    background: #fff;
+    border-radius: 6px;
+}
+
+    .confirmation h1 {
+        font-weight: 900;
+        font-style: italic;
+        text-transform: uppercase;
+        font-size: 1.5rem;
+    }
+
+dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: .4rem 1.25rem;
+}
+
+dt {
+    font-weight: 700;
+}
+
+dd {
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.hint {
+    color: #666;
+    font-size: .9rem;
+}
