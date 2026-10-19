@@ -13,7 +13,10 @@ namespace DinoCars.Infrastructure
             var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<ApplicationDbContext>(options => options
+            .UseSqlServer(connectionString)
+            .UseSeeding((context, _) => DbSeeder.Seed(context))
+            .UseAsyncSeeding((context, _, cancellationToken) => DbSeeder.SeedAsync(context, cancellationToken)));
 
 
             return services;
