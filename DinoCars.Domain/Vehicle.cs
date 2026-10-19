@@ -8,6 +8,8 @@
         public string Model { get; private set; } = null!;
         public string LicensePlate { get; private set; } = null!;
         public string? Vin { get; private set; }
+
+        public Customer Customer { get; private set; } = null!;
         private Vehicle() { }
 
         internal Vehicle(Guid customerId, string make, string model, string licensePlate, string? vin)

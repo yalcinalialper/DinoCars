@@ -1,0 +1,40 @@
+﻿.new-appointment {
+    max-width: 860px;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+    .title-row h1 {
+        margin: 0;
+        font-size: 2.4rem;
+    }
+
+.field.source {
+    max-width: 320px;
+}
+
+.save {
+    padding: .8rem 1.8rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--yellow);
+    color: var(--black);
+    font-family: var(--heading-font);
+    font-style: italic;
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+    .save:disabled {
+        opacity: .6;
+        cursor: default;
+    }

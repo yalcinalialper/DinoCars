@@ -21,7 +21,7 @@ namespace DinoCars.Infrastructure.Data.Configurations
             builder.HasIndex(c => c.MobilePhoneNumber);
 
             builder.HasMany(c => c.Vehicles)
-                .WithOne()
+                .WithOne(v => v.Customer)
                 .HasForeignKey(v => v.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
 

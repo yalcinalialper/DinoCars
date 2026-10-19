@@ -32,6 +32,7 @@ namespace DinoCars.Infrastructure.Data.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Navigation(r => r.Services).UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Property(r => r.Source).HasConversion<string>().HasMaxLength(20);
         }
     }
 

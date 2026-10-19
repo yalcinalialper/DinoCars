@@ -1,0 +1,80 @@
+﻿@using System.Globalization
+@using DinoCars.AppLogic.Reservations.Admin
+@using DinoCars.Domain.Enums
+
+<article class="card status-@Reservation.Status.ToString().ToLowerInvariant()">
+    <header>
+        <div>
+            @Reservation.StartLocal.ToString("ddd d MMM", Dutch) ·
+            <strong>@Reservation.StartLocal.ToString("HH:mm")–@Reservation.EndLocal.ToString("HH:mm")</strong>
+        </div>
+        @if (Reservation.Source != ReservationSource.Online)
+        {
+            <span class="source">via @SourceText</span>
+        }
+        <span class="badge">@StatusText</span>
+    </header>
+
+    <div class="details">
+        <div>
+            <strong>@Reservation.CustomerName</strong><br />
+            <a href="tel:@Reservation.Phone">@Reservation.Phone</a>
+            @if (Reservation.Email is not null)
+            {
+                <br /><a href="mailto:@Reservation.Email">@Reservation.Email</a>
+            }
+        </div>
+        <div>
+            @Reservation.Vehicle<br />
+            <span class="plate">@Reservation.LicensePlate</span> · @Reservation.Mileage.ToString("N0", Dutch) km
+        </div>
+        <div>@string.Join(", ", Reservation.Services)</div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Reservation.Notes))
+    {
+        <p class="notes">“@Reservation.Notes”</p>
+    }
+
+    @if (Reservation.Status is ReservationStatus.Requested or ReservationStatus.Approved)
+    {
+        <footer>
+            @if (Reservation.Status == ReservationStatus.Requested)
+            {
+                <button class="approve" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Approve)">Goedkeuren</button>
+                <button class="reject" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Reject)">Weigeren</button>
+            }
+            else
+            {
+                <button class="approve" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Complete)">Afgerond</button>
+                <button class="reject" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Cancel)">Annuleren</button>
+            }
+        </footer>
+    }
+</article>
+
+@code {
+    private static readonly CultureInfo Dutch = new("nl-BE");
+
+    [Parameter, EditorRequired] public ReservationOverview Reservation { get; set; } = null!;
+    [Parameter] public EventCallback<ReservationAction> OnAction { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private string StatusText => Reservation.Status switch
+    {
+        ReservationStatus.Requested => "Nieuw",
+        ReservationStatus.Approved => "Bevestigd",
+        ReservationStatus.Rejected => "Geweigerd",
+        ReservationStatus.Cancelled => "Geannuleerd",
+        ReservationStatus.Completed => "Afgerond",
+        _ => Reservation.Status.ToString()
+    };
+
+    private string SourceText => Reservation.Source switch
+    {
+        ReservationSource.Phone => "telefoon",
+        ReservationSource.WhatsApp => "WhatsApp",
+        ReservationSource.WalkIn => "langs geweest",
+        _ => ""
+    };
+}

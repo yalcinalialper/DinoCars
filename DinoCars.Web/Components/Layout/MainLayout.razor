@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using DinoCars.Infrastructure.Identity
 
 <header class="site-header">
     <div class="container header-inner">
@@ -9,6 +10,10 @@
             <a href="/#diensten">Diensten</a>
             <a href="/#contact">Contact</a>
 
+            <AuthorizeView Roles="@AppRoles.Staff">
+                <NavLink href="beheer">Beheer</NavLink>
+            </AuthorizeView>
+
             <AuthorizeView>
                 <Authorized>
                     <form action="Account/Logout" method="post" class="logout">
@@ -17,6 +22,7 @@
                         <button type="submit">Uitloggen</button>
                     </form>
                 </Authorized>
+
             </AuthorizeView>
 
             <NavLink href="afspraak" class="nav-cta">Afspraak maken</NavLink>

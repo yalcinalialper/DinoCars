@@ -1,14 +1,11 @@
 ﻿@page "/afspraak"
 @rendermode InteractiveServer
+@inherits ScopedComponentBase
 @using DinoCars.AppLogic
-@using DinoCars.AppLogic.Availability
 @using DinoCars.AppLogic.Reservations
 @using DinoCars.Domain
 @using DinoCars.Domain.Exceptions
-@using Microsoft.Extensions.Options
-@inject IServiceScopeFactory ScopeFactory
-@inject IClock Clock
-@inject IOptions<WorkshopOptions> WorkshopOptions
+@using DinoCars.AppLogic.Availability
 @inject NavigationManager Navigation
 
 <PageTitle>Afspraak maken – Dino Cars</PageTitle>
@@ -19,204 +16,88 @@
         <p>Uw auto in goede handen!</p>
     </header>
 
-    @if (_serviceTypes is null)
-    {
-        <p>Laden…</p>
-    }
-    else
-    {
-        <EditForm Model="_form" OnValidSubmit="SubmitAsync">
-            <DataAnnotationsValidator />
+    <EditForm Model="_form" OnValidSubmit="SubmitAsync">
+        <DataAnnotationsValidator />
 
-            <div class="step">
-                <h2><span>1</span> Wat mogen we doen?</h2>
-                <div class="services">
-                    @foreach (var service in _serviceTypes)
-                    {
-                        <label class="service @(IsSelected(service) ? "selected" : null)">
-                            <input type="checkbox" checked="@IsSelected(service)"
-                                   @onchange="e => ToggleServiceAsync(service, e)" />
-                            <span>@service.Name</span>
-                        </label>
-                    }
-                </div>
+        <ServiceAndTimePicker @ref="_picker"
+                              SelectedServices="_selected"
+                              @bind-SelectedSlot="_selectedSlot"
+                              ServicesChanged="StateHasChanged">
+            <label class="field notes">
+                @(RequiresNotes ? "Omschrijf het probleem (verplicht)" : "Opmerkingen (optioneel)")
+                <InputTextArea @bind-Value="_form.Notes" rows="3" />
+            </label>
+        </ServiceAndTimePicker>
 
-                <label class="field notes">
-                    @(RequiresNotes ? "Omschrijf het probleem (verplicht)" : "Opmerkingen (optioneel)")
-                    <InputTextArea @bind-Value="_form.Notes" rows="3" />
+        <div class="step">
+            <h2><span>3</span> Uw voertuig</h2>
+            <div class="grid">
+                <label class="field">Merk
+                    <InputText @bind-Value="_form.Make" placeholder="bv. Volkswagen" />
+                    <ValidationMessage For="() => _form.Make" />
+                </label>
+                <label class="field">Model
+                    <InputText @bind-Value="_form.Model" placeholder="bv. Golf" />
+                    <ValidationMessage For="() => _form.Model" />
+                </label>
+                <label class="field">Nummerplaat
+                    <InputText @bind-Value="_form.LicensePlate" placeholder="1-ABC-123" />
+                    <ValidationMessage For="() => _form.LicensePlate" />
+                </label>
+                <label class="field">Kilometerstand
+                    <InputNumber @bind-Value="_form.Mileage" />
+                    <ValidationMessage For="() => _form.Mileage" />
+                </label>
+                <label class="field full">Chassisnummer / VIN (optioneel)
+                    <InputText @bind-Value="_form.Vin" />
+                    <ValidationMessage For="() => _form.Vin" />
                 </label>
             </div>
+        </div>
 
-            <div class="step">
-                <h2><span>2</span> Kies een moment</h2>
-
-                @if (_selected.Count == 0)
-                {
-                    <p class="hint">Kies eerst minstens één dienst.</p>
-                }
-                else
-                {
-                    <p class="hint">Geschatte duur: @TotalDuration minuten</p>
-
-                    <label class="field date">
-                        Datum
-                        <InputDate @bind-Value="_date" @bind-Value:after="LoadSlotsAsync"
-                                   min="@_today.ToString("yyyy-MM-dd")" />
-                    </label>
-
-                    @if (_loadingSlots)
-                    {
-                        <p class="hint">Beschikbare uren laden…</p>
-                    }
-                    else if (_slots.Count == 0)
-                    {
-                        <p class="hint">Geen vrije uren op deze dag. Kies een andere datum.</p>
-                    }
-                    else
-                    {
-                        <div class="slots">
-                            @foreach (var slot in _slots)
-                            {
-                                <button type="button"
-                                        class="slot @(slot == _selectedSlot ? "selected" : null)"
-                                        @onclick="() => _selectedSlot = slot">
-                                    @slot.LocalStart.ToString("HH:mm")
-                                </button>
-                            }
-                        </div>
-                    }
-                }
+        <div class="step">
+            <h2><span>4</span> Uw gegevens</h2>
+            <div class="grid">
+                <label class="field">Voornaam
+                    <InputText @bind-Value="_form.FirstName" />
+                    <ValidationMessage For="() => _form.FirstName" />
+                </label>
+                <label class="field">Achternaam
+                    <InputText @bind-Value="_form.LastName" />
+                    <ValidationMessage For="() => _form.LastName" />
+                </label>
+                <label class="field">Telefoon
+                    <InputText @bind-Value="_form.Phone" placeholder="0491 23 45 67" />
+                    <ValidationMessage For="() => _form.Phone" />
+                </label>
+                <label class="field">E-mail (optioneel)
+                    <InputText @bind-Value="_form.Email" />
+                    <ValidationMessage For="() => _form.Email" />
+                </label>
             </div>
+        </div>
 
-            <div class="step">
-                <h2><span>3</span> Uw voertuig</h2>
-                <div class="grid">
-                    <label class="field">
-                        Merk
-                        <InputText @bind-Value="_form.Make" placeholder="bv. Volkswagen" />
-                        <ValidationMessage For="() => _form.Make" />
-                    </label>
-                    <label class="field">
-                        Model
-                        <InputText @bind-Value="_form.Model" placeholder="bv. Golf" />
-                        <ValidationMessage For="() => _form.Model" />
-                    </label>
-                    <label class="field">
-                        Nummerplaat
-                        <InputText @bind-Value="_form.LicensePlate" placeholder="1-ABC-123" />
-                        <ValidationMessage For="() => _form.LicensePlate" />
-                    </label>
-                    <label class="field">
-                        Kilometerstand
-                        <InputNumber @bind-Value="_form.Mileage" />
-                        <ValidationMessage For="() => _form.Mileage" />
-                    </label>
-                    <label class="field full">
-                        Chassisnummer / VIN (optioneel)
-                        <InputText @bind-Value="_form.Vin" />
-                        <ValidationMessage For="() => _form.Vin" />
-                    </label>
-                </div>
-            </div>
+        @if (_errorMessage is not null)
+        {
+            <div class="error">@_errorMessage</div>
+        }
 
-            <div class="step">
-                <h2><span>4</span> Uw gegevens</h2>
-                <div class="grid">
-                    <label class="field">
-                        Voornaam
-                        <InputText @bind-Value="_form.FirstName" />
-                        <ValidationMessage For="() => _form.FirstName" />
-                    </label>
-                    <label class="field">
-                        Achternaam
-                        <InputText @bind-Value="_form.LastName" />
-                        <ValidationMessage For="() => _form.LastName" />
-                    </label>
-                    <label class="field">
-                        Telefoon
-                        <InputText @bind-Value="_form.Phone" placeholder="0491 23 45 67" />
-                        <ValidationMessage For="() => _form.Phone" />
-                    </label>
-                    <label class="field">
-                        E-mail (optioneel)
-                        <InputText @bind-Value="_form.Email" />
-                        <ValidationMessage For="() => _form.Email" />
-                    </label>
-                </div>
-            </div>
-
-            @if (_errorMessage is not null)
-            {
-                <div class="error">@_errorMessage</div>
-            }
-
-            <button type="submit" class="submit" disabled="@_submitting">
-                @(_submitting ? "Bezig…" : "Afspraak aanvragen")
-            </button>
-            <p class="hint">De garage bekijkt uw aanvraag en bevestigt ze zo snel mogelijk.</p>
-        </EditForm>
-    }
+        <button type="submit" class="submit" disabled="@_submitting">
+            @(_submitting ? "Bezig…" : "Afspraak aanvragen")
+        </button>
+        <p class="hint">De garage bekijkt uw aanvraag en bevestigt ze zo snel mogelijk.</p>
+    </EditForm>
 </section>
 
 @code {
     private readonly AppointmentForm _form = new();
     private readonly List<ServiceType> _selected = [];
-    private IReadOnlyList<ServiceType>? _serviceTypes;
-    private IReadOnlyList<AvailableSlot> _slots = [];
+    private ServiceAndTimePicker _picker = null!;
     private AvailableSlot? _selectedSlot;
-    private DateOnly _today;
-    private DateOnly _date;
-    private bool _loadingSlots;
     private bool _submitting;
     private string? _errorMessage;
 
-    private int TotalDuration => _selected.Sum(s => s.DurationMinutes);
     private bool RequiresNotes => _selected.Any(s => s.Code == ServiceType.OtherCode);
-
-    protected override async Task OnInitializedAsync()
-    {
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(WorkshopOptions.Value.TimeZoneId);
-        _today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(Clock.UtcNow, timeZone));
-        _date = _today;
-
-        _serviceTypes = await RunScopedAsync<IServiceTypeRepository, IReadOnlyList<ServiceType>>(
-            repo => repo.GetActiveAsync());
-    }
-
-    private bool IsSelected(ServiceType service) => _selected.Any(s => s.Id == service.Id);
-
-    private async Task ToggleServiceAsync(ServiceType service, ChangeEventArgs e)
-    {
-        if (e.Value is true && !IsSelected(service))
-            _selected.Add(service);
-        else if (e.Value is not true)
-            _selected.RemoveAll(s => s.Id == service.Id);
-
-        await LoadSlotsAsync();
-    }
-
-    private async Task LoadSlotsAsync()
-    {
-        _selectedSlot = null;
-        _slots = [];
-
-        if (_selected.Count == 0)
-            return;
-
-        if (_date < _today)
-            _date = _today;
-
-        _loadingSlots = true;
-        try
-        {
-            _slots = await RunScopedAsync<IAvailabilityService, IReadOnlyList<AvailableSlot>>(
-                availability => availability.GetAvailableSlotsAsync(_date, TotalDuration));
-        }
-        finally
-        {
-            _loadingSlots = false;
-        }
-    }
 
     private async Task SubmitAsync()
     {
@@ -242,20 +123,11 @@
         catch (DomainException ex)
         {
             _errorMessage = ex.Message;
-            await LoadSlotsAsync(); // the slot may have just been taken, so refresh the list
+            await _picker.RefreshSlotsAsync(); // the slot may have just been taken
         }
         finally
         {
             _submitting = false;
         }
-    }
-
-    // A fresh scope (and so a fresh DbContext) per action. See the explanation above.
-    private async Task<TResult> RunScopedAsync<TService, TResult>(Func<TService, Task<TResult>> action)
-        where TService : notnull
-    {
-        await using var scope = ScopeFactory.CreateAsyncScope();
-        var service = scope.ServiceProvider.GetRequiredService<TService>();
-        return await action(service);
     }
 }
