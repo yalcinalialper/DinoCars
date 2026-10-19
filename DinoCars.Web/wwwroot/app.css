@@ -57,3 +57,82 @@ h1, h2, h3 {
         background: #fff;
         color: var(--black);
     }
+
+/* ---------- Shared form styles ---------- */
+.step {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+    .step h2 {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-size: 1.3rem;
+    }
+
+        .step h2 span {
+            display: inline-grid;
+            place-items: center;
+            width: 1.9rem;
+            height: 1.9rem;
+            border-radius: 50%;
+            background: var(--yellow);
+            color: var(--black);
+            font-style: normal;
+        }
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .9rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+    .field.full, .field.notes {
+        grid-column: 1 / -1;
+        margin-top: .75rem;
+    }
+
+    .field input, .field textarea, .field select {
+        padding: .55rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font: inherit;
+        font-weight: 400;
+    }
+
+.validation-message {
+    color: #c00;
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.hint {
+    color: #666;
+    font-size: .9rem;
+}
+
+.error {
+    margin-bottom: .75rem;
+    padding: .75rem;
+    border-radius: 6px;
+    background: #fde8e8;
+    color: #a00;
+}
+
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

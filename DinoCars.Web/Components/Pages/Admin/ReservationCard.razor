@@ -8,6 +8,10 @@
             @Reservation.StartLocal.ToString("ddd d MMM", Dutch) ·
             <strong>@Reservation.StartLocal.ToString("HH:mm")–@Reservation.EndLocal.ToString("HH:mm")</strong>
         </div>
+        @if (Reservation.Source != ReservationSource.Online)
+        {
+            <span class="source">via @SourceText</span>
+        }
         <span class="badge">@StatusText</span>
     </header>
 
@@ -64,5 +68,13 @@
         ReservationStatus.Cancelled => "Geannuleerd",
         ReservationStatus.Completed => "Afgerond",
         _ => Reservation.Status.ToString()
+    };
+
+    private string SourceText => Reservation.Source switch
+    {
+        ReservationSource.Phone => "telefoon",
+        ReservationSource.WhatsApp => "WhatsApp",
+        ReservationSource.WalkIn => "langs geweest",
+        _ => ""
     };
 }

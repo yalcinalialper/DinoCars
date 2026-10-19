@@ -91,3 +91,6 @@ footer {
 .reject {
     background: #fff;
 }
+
+header { gap: .5rem; flex-wrap: wrap; }
+.source { margin-left: auto; color: #777; font-size: .85rem; font-style: italic; }

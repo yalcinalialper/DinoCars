@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DinoCars.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,5 +17,6 @@ namespace DinoCars.AppLogic.Reservations
         int Mileage,
         IReadOnlyCollection<Guid> ServiceTypeIds,
         DateTime StartUtc,
-        string? CustomerNotes);
+        string? CustomerNotes,
+       ReservationSource Source = ReservationSource.Online);
 }

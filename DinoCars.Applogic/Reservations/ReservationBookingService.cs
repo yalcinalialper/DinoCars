@@ -1,5 +1,6 @@
 ﻿using DinoCars.AppLogic.Availability;
 using DinoCars.Domain;
+using DinoCars.Domain.Enums;
 using DinoCars.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace DinoCars.AppLogic.Reservations
             // 1. Load the chosen services and check they all exist.
             var requestedIds = request.ServiceTypeIds.Distinct().ToList();
             var selectedServices = await serviceTypes.GetByIdsAsync(requestedIds, cancellationToken);
+            var isStaffBooking = request.Source != ReservationSource.Online;
 
             if (selectedServices.Count != requestedIds.Count)
                 throw new DomainException("One or more selected services do not exist.");
@@ -27,7 +29,7 @@ namespace DinoCars.AppLogic.Reservations
             // 2. Check the slot again, since it may have been taken since the page loaded.
             var durationMinutes = selectedServices.Sum(s => s.DurationMinutes);
 
-            if (!await availability.IsSlotAvailableAsync(request.StartUtc, durationMinutes, cancellationToken))
+            if (!await availability.IsSlotAvailableAsync(request.StartUtc, durationMinutes, isStaffBooking, cancellationToken))
                 throw new DomainException("This time slot is no longer available. Please choose another time.");
 
             var now = clock.UtcNow;
@@ -45,9 +47,13 @@ namespace DinoCars.AppLogic.Reservations
             var vehicle = customer.FindVehicle(request.LicensePlate)
                 ?? customer.AddVehicle(request.Make, request.Model, request.LicensePlate, request.Vin);
 
-            // 5. Create the reservation. All domain rules are checked inside Create.
+            // creating the reservation:
             var reservation = Reservation.Create(
-                vehicle, request.StartUtc, selectedServices, request.Mileage, request.CustomerNotes, now);
+                vehicle, request.StartUtc, selectedServices, request.Mileage, request.CustomerNotes, now, request.Source);
+
+            // The garage already agreed on this time with the customer, so it's confirmed immediately.
+            if (isStaffBooking)
+                reservation.Approve();
 
             reservations.Add(reservation);
 

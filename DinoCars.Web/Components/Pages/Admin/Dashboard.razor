@@ -19,7 +19,10 @@
 <section class="admin container">
     <div class="title-row">
         <h1>Beheer</h1>
-        <button class="refresh" disabled="@_busy" @onclick="LoadAsync">Vernieuwen</button>
+        <div class="title-actions">
+            <a href="beheer/nieuw" class="btn btn-yellow">+ Nieuwe afspraak</a>
+            <button class="refresh" disabled="@_busy" @onclick="LoadAsync">Vernieuwen</button>
+        </div>
     </div>
 
     @if (_error is not null)

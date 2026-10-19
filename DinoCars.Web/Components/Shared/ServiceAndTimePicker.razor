@@ -1,0 +1,154 @@
+﻿@inherits ScopedComponentBase
+@using DinoCars.AppLogic
+@using DinoCars.AppLogic.Availability
+@using DinoCars.Domain
+@using Microsoft.Extensions.Options
+@inject IClock Clock
+@inject IOptions<WorkshopOptions> WorkshopOptions
+
+<div class="step">
+    <h2><span>1</span> Wat mogen we doen?</h2>
+
+    @if (_serviceTypes is null)
+    {
+        <p class="hint">Laden…</p>
+    }
+    else
+    {
+        <div class="services">
+            @foreach (var service in _serviceTypes)
+            {
+                <label class="service @(IsSelected(service) ? "selected" : null)">
+                    <input type="checkbox" checked="@IsSelected(service)"
+                           @onchange="e => ToggleServiceAsync(service, e)" />
+                    <span>@service.Name</span>
+                </label>
+            }
+        </div>
+    }
+
+    @ChildContent
+</div>
+
+<div class="step">
+    <h2><span>2</span> Kies een moment</h2>
+
+    @if (SelectedServices.Count == 0)
+    {
+        <p class="hint">Kies eerst minstens één dienst.</p>
+    }
+    else
+    {
+        <p class="hint">Geschatte duur: @TotalDuration minuten</p>
+
+        <label class="field date">
+            Datum
+            <InputDate @bind-Value="_date" @bind-Value:after="LoadSlotsAsync"
+                       min="@_today.ToString("yyyy-MM-dd")" />
+        </label>
+
+        @if (_loadingSlots)
+        {
+            <p class="hint">Beschikbare uren laden…</p>
+        }
+        else if (_slots.Count == 0)
+        {
+            <p class="hint">Geen vrije uren op deze dag. Kies een andere datum.</p>
+        }
+        else
+        {
+            <div class="slots">
+                @foreach (var slot in _slots)
+                {
+                    <button type="button"
+                            class="slot @(slot == SelectedSlot ? "selected" : null)"
+                            @onclick="() => SelectSlotAsync(slot)">
+                        @slot.LocalStart.ToString("HH:mm")
+                    </button>
+                }
+            </div>
+        }
+    }
+</div>
+
+@code {
+    /// <summary>The list of chosen services. Owned by the parent page, filled by this component.</summary>
+    [Parameter, EditorRequired] public List<ServiceType> SelectedServices { get; set; } = null!;
+
+    [Parameter] public AvailableSlot? SelectedSlot { get; set; }
+    [Parameter] public EventCallback<AvailableSlot?> SelectedSlotChanged { get; set; }
+    [Parameter] public EventCallback ServicesChanged { get; set; }
+
+    /// <summary>Staff bookings may be for "in a bit", so they skip the minimum notice.</summary>
+    [Parameter] public bool IgnoreMinimumNotice { get; set; }
+
+    /// <summary>Extra content shown at the bottom of step 1 (the notes field).</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private IReadOnlyList<ServiceType>? _serviceTypes;
+    private IReadOnlyList<AvailableSlot> _slots = [];
+    private DateOnly _today;
+    private DateOnly _date;
+    private bool _loadingSlots;
+
+    private int TotalDuration => SelectedServices.Sum(s => s.DurationMinutes);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(WorkshopOptions.Value.TimeZoneId);
+        _today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(Clock.UtcNow, timeZone));
+        _date = _today;
+
+        _serviceTypes = await RunScopedAsync<IServiceTypeRepository, IReadOnlyList<ServiceType>>(
+            repo => repo.GetActiveAsync());
+    }
+
+    /// <summary>Called by the parent, e.g. after a booking failed because the slot was just taken.</summary>
+    public async Task RefreshSlotsAsync()
+    {
+        await LoadSlotsAsync();
+        StateHasChanged();
+    }
+
+    private bool IsSelected(ServiceType service) => SelectedServices.Any(s => s.Id == service.Id);
+
+    private async Task ToggleServiceAsync(ServiceType service, ChangeEventArgs e)
+    {
+        if (e.Value is true && !IsSelected(service))
+            SelectedServices.Add(service);
+        else if (e.Value is not true)
+            SelectedServices.RemoveAll(s => s.Id == service.Id);
+
+        await ServicesChanged.InvokeAsync();
+        await LoadSlotsAsync();
+    }
+
+    private async Task LoadSlotsAsync()
+    {
+        _slots = [];
+        await SelectSlotAsync(null);
+
+        if (SelectedServices.Count == 0)
+            return;
+
+        if (_date < _today)
+            _date = _today;
+
+        _loadingSlots = true;
+        try
+        {
+            _slots = await RunScopedAsync<IAvailabilityService, IReadOnlyList<AvailableSlot>>(
+                availability => availability.GetAvailableSlotsAsync(_date, TotalDuration, IgnoreMinimumNotice));
+        }
+        finally
+        {
+            _loadingSlots = false;
+        }
+    }
+
+    private async Task SelectSlotAsync(AvailableSlot? slot)
+    {
+        SelectedSlot = slot;
+        await SelectedSlotChanged.InvokeAsync(slot);
+    }
+}

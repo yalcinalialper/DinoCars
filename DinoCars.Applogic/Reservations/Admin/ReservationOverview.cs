@@ -10,6 +10,7 @@ namespace DinoCars.AppLogic.Reservations.Admin
         DateTime StartLocal,
         DateTime EndLocal,
         ReservationStatus Status,
+        ReservationSource Source,
         string CustomerName,
         string Phone,
         string? Email,

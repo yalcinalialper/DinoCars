@@ -16,6 +16,7 @@ namespace DinoCars.Domain
         public DateTime EndUtc { get; private set; }
 
         public ReservationStatus Status { get; private set;  }
+        public ReservationSource Source { get; private set; }
         public int Mileage { get; private set; }
         public string? CustomerNotes { get; private set; }
         public string AccessToken { get; private set; } = null!;
@@ -31,7 +32,8 @@ namespace DinoCars.Domain
             IReadOnlyCollection<ServiceType> serviceTypes,
             int mileage,
             string? customerNotes,
-            DateTime nowUtc)
+            DateTime nowUtc,
+            ReservationSource source = ReservationSource.Online)
         {
             ArgumentNullException.ThrowIfNull(vehicle, nameof(vehicle));
             ArgumentNullException.ThrowIfNull(serviceTypes, nameof(serviceTypes));
@@ -66,7 +68,8 @@ namespace DinoCars.Domain
                 Mileage = mileage,
                 CustomerNotes = notes,
                 AccessToken = GenerateAccessToken(),
-                CreatedAtUtc = nowUtc
+                CreatedAtUtc = nowUtc,
+                Source = source
             };
 
             foreach (var serviceType in serviceTypes.DistinctBy(s => s.Id))

@@ -1,0 +1,141 @@
+﻿@page "/beheer/nieuw"
+@rendermode InteractiveServer
+@inherits ScopedComponentBase
+@attribute [Authorize(Roles = AppRoles.Staff)]
+@using DinoCars.AppLogic.Availability
+@using DinoCars.AppLogic.Reservations
+@using DinoCars.Domain
+@using DinoCars.Domain.Enums
+@using DinoCars.Domain.Exceptions
+@using DinoCars.Infrastructure.Identity
+@using DinoCars.Web.Components.Pages.Appointments
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager Navigation
+
+<PageTitle>Nieuwe afspraak – Dino Cars</PageTitle>
+
+<section class="container new-appointment">
+    <div class="title-row">
+        <h1>Nieuwe afspraak</h1>
+        <a href="beheer">← Terug naar beheer</a>
+    </div>
+
+    <div class="step">
+        <label class="field source">
+            Hoe kwam deze afspraak binnen?
+            <select @bind="_source">
+                <option value="@ReservationSource.Phone">Telefoon</option>
+                <option value="@ReservationSource.WhatsApp">WhatsApp</option>
+                <option value="@ReservationSource.WalkIn">Langs geweest</option>
+            </select>
+        </label>
+        <p class="hint">Deze afspraak wordt meteen bevestigd.</p>
+    </div>
+
+    <EditForm Model="_form" OnValidSubmit="SubmitAsync">
+        <DataAnnotationsValidator />
+
+        <ServiceAndTimePicker @ref="_picker"
+                              SelectedServices="_selected"
+                              @bind-SelectedSlot="_selectedSlot"
+                              ServicesChanged="StateHasChanged"
+                              IgnoreMinimumNotice="true">
+            <label class="field notes">
+                @(RequiresNotes ? "Omschrijving van het probleem (verplicht)" : "Notities (optioneel)")
+                <InputTextArea @bind-Value="_form.Notes" rows="2" />
+            </label>
+        </ServiceAndTimePicker>
+
+        <div class="step">
+            <h2><span>3</span> Klant en voertuig</h2>
+            <div class="grid">
+                <label class="field">Voornaam
+                    <InputText @bind-Value="_form.FirstName" />
+                    <ValidationMessage For="() => _form.FirstName" />
+                </label>
+                <label class="field">Achternaam
+                    <InputText @bind-Value="_form.LastName" />
+                    <ValidationMessage For="() => _form.LastName" />
+                </label>
+                <label class="field">Telefoon
+                    <InputText @bind-Value="_form.Phone" />
+                    <ValidationMessage For="() => _form.Phone" />
+                </label>
+                <label class="field">E-mail (optioneel)
+                    <InputText @bind-Value="_form.Email" />
+                    <ValidationMessage For="() => _form.Email" />
+                </label>
+                <label class="field">Merk
+                    <InputText @bind-Value="_form.Make" />
+                    <ValidationMessage For="() => _form.Make" />
+                </label>
+                <label class="field">Model
+                    <InputText @bind-Value="_form.Model" />
+                    <ValidationMessage For="() => _form.Model" />
+                </label>
+                <label class="field">Nummerplaat
+                    <InputText @bind-Value="_form.LicensePlate" />
+                    <ValidationMessage For="() => _form.LicensePlate" />
+                </label>
+                <label class="field">Kilometerstand
+                    <InputNumber @bind-Value="_form.Mileage" />
+                    <ValidationMessage For="() => _form.Mileage" />
+                </label>
+            </div>
+        </div>
+
+        @if (_errorMessage is not null)
+        {
+            <div class="error">@_errorMessage</div>
+        }
+
+        <button type="submit" class="save" disabled="@_submitting">
+            @(_submitting ? "Bezig…" : "Afspraak opslaan")
+        </button>
+    </EditForm>
+</section>
+
+@code {
+    private readonly AppointmentForm _form = new();
+    private readonly List<ServiceType> _selected = [];
+    private ServiceAndTimePicker _picker = null!;
+    private AvailableSlot? _selectedSlot;
+    private ReservationSource _source = ReservationSource.Phone;
+    private bool _submitting;
+    private string? _errorMessage;
+
+    private bool RequiresNotes => _selected.Any(s => s.Code == ServiceType.OtherCode);
+
+    private async Task SubmitAsync()
+    {
+        _errorMessage = null;
+
+        if (_selected.Count == 0) { _errorMessage = "Kies minstens één dienst."; return; }
+        if (_selectedSlot is null) { _errorMessage = "Kies een datum en een uur."; return; }
+        if (RequiresNotes && string.IsNullOrWhiteSpace(_form.Notes)) { _errorMessage = "Omschrijf het probleem bij 'Overige'."; return; }
+
+        var request = new BookReservationRequest(
+            _form.FirstName, _form.LastName, _form.Phone, _form.Email,
+            _form.Make, _form.Model, _form.LicensePlate, _form.Vin, _form.Mileage!.Value,
+            _selected.Select(s => s.Id).ToList(), _selectedSlot.StartUtc, _form.Notes,
+            _source);
+
+        _submitting = true;
+        try
+        {
+            await RunScopedAsync<IReservationBookingService, BookingConfirmation>(
+                booking => booking.BookAsync(request));
+
+            Navigation.NavigateTo("/beheer");
+        }
+        catch (DomainException ex)
+        {
+            _errorMessage = ex.Message;
+            await _picker.RefreshSlotsAsync();
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+}

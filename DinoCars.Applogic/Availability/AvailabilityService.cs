@@ -11,7 +11,7 @@ namespace DinoCars.AppLogic.Availability
         private readonly TimeZoneInfo _timeZone = TimeZoneInfo.FindSystemTimeZoneById(options.Value.TimeZoneId);
 
         public async Task<IReadOnlyList<AvailableSlot>> GetAvailableSlotsAsync(
-            DateOnly localDate, int durationMinutes, CancellationToken cancellationToken = default)
+            DateOnly localDate, int durationMinutes, bool ignoreMinimumNotice = false, CancellationToken cancellationToken = default)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(durationMinutes);
 
@@ -26,7 +26,9 @@ namespace DinoCars.AppLogic.Availability
 
             // One database call for the whole day, then everything else happens in memory.
             var existing = await reservations.GetBlockingInRangeAsync(dayStartUtc, dayEndUtc, cancellationToken);
-            var earliestAllowedUtc = clock.UtcNow.AddMinutes(_workshop.MinimumNoticeMinutes);
+            var earliestAllowedUtc = ignoreMinimumNotice
+                ? clock.UtcNow
+                : clock.UtcNow.AddMinutes(_workshop.MinimumNoticeMinutes);
 
             var slots = new List<AvailableSlot>();
 
@@ -48,10 +50,10 @@ namespace DinoCars.AppLogic.Availability
         }
 
         public async Task<bool> IsSlotAvailableAsync(
-            DateTime startUtc, int durationMinutes, CancellationToken cancellationToken = default)
+           DateTime startUtc, int durationMinutes, bool ignoreMinimumNotice = false, CancellationToken cancellationToken = default)
         {
             var localDate = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(startUtc, _timeZone));
-            var slots = await GetAvailableSlotsAsync(localDate, durationMinutes, cancellationToken);
+            var slots = await GetAvailableSlotsAsync(localDate, durationMinutes, ignoreMinimumNotice, cancellationToken);
             return slots.Any(s => s.StartUtc == startUtc);
         }
 

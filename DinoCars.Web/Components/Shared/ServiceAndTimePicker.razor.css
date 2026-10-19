@@ -1,0 +1,45 @@
+﻿.services {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: .5rem;
+}
+
+.service {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .65rem .8rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .service.selected {
+        border-color: var(--yellow);
+        background: #fff8db;
+    }
+
+.field.date {
+    max-width: 220px;
+}
+
+.slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: .75rem;
+}
+
+.slot {
+    padding: .45rem 1rem;
+    border: 2px solid var(--black);
+    border-radius: 6px;
+    background: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .slot.selected {
+        background: var(--yellow);
+        border-color: var(--yellow);
+    }

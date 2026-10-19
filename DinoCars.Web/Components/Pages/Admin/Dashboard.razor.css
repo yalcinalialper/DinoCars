@@ -79,3 +79,9 @@
     background: #fde8e8;
     color: #a00;
 }
+
+.title-actions {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
