@@ -1,0 +1,172 @@
+﻿.booking {
+    --yellow: #ffc400;
+    --black: #111;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.booking-hero {
+    background: var(--black);
+    color: #fff;
+    padding: 2rem 1.5rem;
+    border-left: 6px solid var(--yellow);
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+    .booking-hero h1 {
+        margin: 0;
+        color: var(--yellow);
+        font-weight: 900;
+        font-style: italic;
+        text-transform: uppercase;
+    }
+
+    .booking-hero p {
+        margin: .25rem 0 0;
+        font-weight: 600;
+    }
+
+.step {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+    .step h2 {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+        .step h2 span {
+            display: inline-grid;
+            place-items: center;
+            width: 1.9rem;
+            height: 1.9rem;
+            border-radius: 50%;
+            background: var(--yellow);
+            color: var(--black);
+        }
+
+.services {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: .5rem;
+}
+
+.service {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .65rem .8rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .service.selected {
+        border-color: var(--yellow);
+        background: #fff8db;
+    }
+
+.slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: .75rem;
+}
+
+.slot {
+    padding: .45rem 1rem;
+    border: 2px solid var(--black);
+    border-radius: 6px;
+    background: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .slot.selected {
+        background: var(--yellow);
+        border-color: var(--yellow);
+    }
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .9rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+    .field.full, .field.notes {
+        grid-column: 1 / -1;
+        margin-top: .75rem;
+    }
+
+    .field.date {
+        max-width: 220px;
+    }
+
+/* ::deep reaches into child components such as InputText and ValidationMessage */
+.booking ::deep .field input,
+.booking ::deep .field textarea {
+    padding: .55rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-weight: 400;
+}
+
+.booking ::deep .validation-message {
+    color: #c00;
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.hint {
+    color: #666;
+    font-size: .9rem;
+}
+
+.error {
+    margin-bottom: .75rem;
+    padding: .75rem;
+    border-radius: 6px;
+    background: #fde8e8;
+    color: #a00;
+}
+
+.submit {
+    padding: .9rem 2rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--yellow);
+    color: var(--black);
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+    .submit:disabled {
+        opacity: .6;
+        cursor: default;
+    }
+
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
