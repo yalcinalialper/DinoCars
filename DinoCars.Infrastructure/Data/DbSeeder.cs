@@ -8,10 +8,16 @@ namespace DinoCars.Infrastructure.Data
         private static readonly (string Code, string Name, int DurationMinutes)[] DefaultServiceTypes =
 [
     ("MAINTENANCE", "Onderhoud", 60),
-        ("LIGHTS_CHECK", "Lichten checken", 60),
-        ("BRAKES_CHECK", "Remmen controleren", 60),
-        ("BATTERY_TEST", "12V-accu testen", 60),
-        (ServiceType.OtherCode, "Overige", 60)
+    ("OIL_CHANGE", "Olie verversen", 60),
+    ("AIRCO", "Airco invullen", 60),
+    ("DIAGNOSIS", "Diagnose", 60),
+    ("BRAKES_CHECK", "Remmen controleren", 60),
+    ("TIRES", "Banden wisselen & balanceren", 60),
+    ("BATTERY_TEST", "12V-accu testen", 60),
+    ("LIGHTS_CHECK", "Lichten checken", 60),
+    ("WINDSHIELD", "Autoruit herstel / vervanging", 120),
+    ("POLISHING", "Auto poleren", 120),
+    (ServiceType.OtherCode, "Overige", 60)
 ];
 
         public static void Seed(DbContext context)

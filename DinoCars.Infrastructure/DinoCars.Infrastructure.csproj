@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DinoCars.AppLogic\DinoCars.AppLogic.csproj" />
     <ProjectReference Include="..\DinoCars.Domain\DinoCars.Domain.csproj" />
   </ItemGroup>
 

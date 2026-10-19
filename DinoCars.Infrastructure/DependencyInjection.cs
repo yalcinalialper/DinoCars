@@ -1,8 +1,9 @@
-﻿using DinoCars.Infrastructure.Data;
+﻿using DinoCars.AppLogic;
+using DinoCars.Infrastructure.Data;
+using DinoCars.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace DinoCars.Infrastructure
 {
@@ -17,6 +18,11 @@ namespace DinoCars.Infrastructure
             .UseSqlServer(connectionString)
             .UseSeeding((context, _) => DbSeeder.Seed(context))
             .UseAsyncSeeding((context, _, cancellationToken) => DbSeeder.SeedAsync(context, cancellationToken)));
+            services.AddSingleton<IClock, SystemClock>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IReservationRepository, ReservationRepository>();
 
 
             return services;

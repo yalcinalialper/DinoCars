@@ -35,6 +35,12 @@
             _vehicles.Add(vehicle);
             return vehicle;
         }
+        public Vehicle? FindVehicle(string licensePlate)
+        {
+            var normalized = Vehicle.NormalizeLicensePlate(licensePlate);
+            return _vehicles.FirstOrDefault(v => v.LicensePlate == normalized);
+        }
+
 
     }
 }

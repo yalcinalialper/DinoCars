@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DinoCars.AppLogic\DinoCars.AppLogic.csproj" />
     <ProjectReference Include="..\DinoCars.Domain\DinoCars.Domain.csproj" />
     <ProjectReference Include="..\DinoCars.Infrastructure\DinoCars.Infrastructure.csproj" />
   </ItemGroup>
