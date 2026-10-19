@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="DinoCars.Applogic/DinoCars.AppLogic.csproj" />
   <Project Path="DinoCars.Domain/DinoCars.Domain.csproj" />
   <Project Path="DinoCars.Infrastructure/DinoCars.Infrastructure.csproj" />
   <Project Path="DinoCars.Web/DinoCars.Web.csproj" />
