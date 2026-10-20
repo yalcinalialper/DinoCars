@@ -3,6 +3,7 @@
 @using DinoCars.AppLogic
 @using DinoCars.AppLogic.Availability
 @using DinoCars.Domain
+@using DinoCars.Domain.Common
 @using DinoCars.Domain.Enums
 @using Microsoft.Extensions.Options
 @inject IReservationRepository Reservations
@@ -29,7 +30,7 @@
             <dd>@ToLocal(_reservation.StartUtc).ToString("HH:mm") – @ToLocal(_reservation.EndUtc).ToString("HH:mm")</dd>
 
             <dt>Voertuig</dt>
-            <dd>@_reservation.Vehicle.Make @_reservation.Vehicle.Model (@_reservation.Vehicle.LicensePlate)</dd>
+            <dd>@_reservation.Vehicle.Make @_reservation.Vehicle.Model (@LicensePlateFormat.Display(_reservation.Vehicle.LicensePlate))</dd>
 
             <dt>Diensten</dt>
             <dd>@string.Join(", ", _reservation.Services.Select(s => s.ServiceType.Name))</dd>
@@ -76,5 +77,5 @@
     ? ""
     : $"Hallo Dino Cars, ik heb een vraag over mijn afspraak op " +
       $"{ToLocal(_reservation.StartUtc).ToString("dddd d MMMM 'om' HH:mm", Dutch)} " +
-      $"({_reservation.Vehicle.LicensePlate}).";
+      $"({LicensePlateFormat.Display(_reservation.Vehicle.LicensePlate)}).";
 }

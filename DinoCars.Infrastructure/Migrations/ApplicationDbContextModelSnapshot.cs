@@ -185,9 +185,10 @@ namespace DinoCars.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("LicensePlate");
+
+                    b.HasIndex("CustomerId", "LicensePlate")
+                        .IsUnique();
 
                     b.ToTable("Vehicles", (string)null);
                 });

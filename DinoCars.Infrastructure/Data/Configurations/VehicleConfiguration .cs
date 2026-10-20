@@ -18,6 +18,7 @@ namespace DinoCars.Infrastructure.Data.Configurations
             builder.Property(v => v.Vin).HasMaxLength(17);
 
             builder.HasIndex(v => v.LicensePlate);
+            builder.HasIndex(v => new { v.CustomerId, v.LicensePlate }).IsUnique();
         }
     }
 }

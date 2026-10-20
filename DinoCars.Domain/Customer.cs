@@ -1,4 +1,6 @@
-﻿namespace DinoCars.Domain
+﻿using DinoCars.Domain.Common;
+
+namespace DinoCars.Domain
 {
     public sealed class Customer
     {
@@ -37,7 +39,7 @@
         }
         public Vehicle? FindVehicle(string licensePlate)
         {
-            var normalized = Vehicle.NormalizeLicensePlate(licensePlate);
+            var normalized = LicensePlateFormat.Normalize(licensePlate);
             return _vehicles.FirstOrDefault(v => v.LicensePlate == normalized);
         }
 
