@@ -1,4 +1,6 @@
-﻿namespace DinoCars.Domain
+﻿using DinoCars.Domain.Common;
+
+namespace DinoCars.Domain
 {
     public sealed class Vehicle
     {
@@ -22,12 +24,9 @@
             CustomerId = customerId;
             Make = make.Trim();
             Model = model.Trim();
-            LicensePlate = NormalizeLicensePlate(licensePlate);
+            LicensePlate = LicensePlateFormat.Normalize(licensePlate);
             Vin = NormalizeVin(vin);
         }
-
-        internal static string NormalizeLicensePlate(string licensePlate) =>
-        licensePlate.Trim().ToUpperInvariant();
 
         private static string? NormalizeVin(string? vin)
         {

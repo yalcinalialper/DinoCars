@@ -1,5 +1,6 @@
 ﻿using DinoCars.AppLogic.Availability;
 using DinoCars.Domain;
+using DinoCars.Domain.Common;
 using DinoCars.Domain.Enums;
 using DinoCars.Domain.Exceptions;
 using Microsoft.Extensions.Options;
@@ -69,7 +70,7 @@ namespace DinoCars.AppLogic.Reservations.Admin
                 customer.MobilePhoneNumber,
                 customer.Email,
                 $"{r.Vehicle.Make} {r.Vehicle.Model}",
-                r.Vehicle.LicensePlate,
+                LicensePlateFormat.Display(r.Vehicle.LicensePlate),
                 r.Mileage,
                 r.Services.Select(s => s.ServiceType.Name).ToList(),
                 r.CustomerNotes,
