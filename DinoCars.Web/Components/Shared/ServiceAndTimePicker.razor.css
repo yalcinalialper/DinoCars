@@ -8,15 +8,25 @@
     display: flex;
     align-items: center;
     gap: .6rem;
-    padding: .65rem .8rem;
-    border: 2px solid #ddd;
-    border-radius: 6px;
+    padding: .7rem .85rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: .925rem;
     cursor: pointer;
+    transition: border-color .15s, background-color .15s;
 }
+
+    .service:hover {
+        border-color: #cfcfcf;
+    }
 
     .service.selected {
         border-color: var(--yellow);
-        background: #fff8db;
+        background: #fffaeb;
+    }
+
+    .service input {
+        accent-color: var(--black);
     }
 
 .field.date {
@@ -27,19 +37,28 @@
     display: flex;
     flex-wrap: wrap;
     gap: .5rem;
-    margin-top: .75rem;
+    margin-top: 1rem;
 }
 
 .slot {
-    padding: .45rem 1rem;
-    border: 2px solid var(--black);
-    border-radius: 6px;
+    min-width: 4.5rem;
+    padding: .5rem .9rem;
+    border: 1px solid #d6d6d6;
+    border-radius: 8px;
     background: #fff;
-    font-weight: 700;
+    font-family: inherit;
+    font-size: .9rem;
+    font-weight: 500;
     cursor: pointer;
+    transition: border-color .15s, background-color .15s;
 }
 
+    .slot:hover {
+        border-color: var(--black);
+    }
+
     .slot.selected {
-        background: var(--yellow);
         border-color: var(--yellow);
+        background: var(--yellow);
+        font-weight: 600;
     }

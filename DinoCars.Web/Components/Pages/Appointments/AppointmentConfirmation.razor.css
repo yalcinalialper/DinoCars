@@ -1,35 +1,40 @@
 ﻿.confirmation {
     max-width: 640px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    border-top: 6px solid #ffc400;
-    background: #fff;
-    border-radius: 6px;
+    margin: 3rem auto;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--yellow);
+    border-radius: var(--radius);
+    background: var(--surface);
 }
 
     .confirmation h1 {
-        font-weight: 900;
-        font-style: italic;
-        text-transform: uppercase;
+        margin: 0 0 .5rem;
         font-size: 1.5rem;
     }
 
 dl {
     display: grid;
     grid-template-columns: max-content 1fr;
-    gap: .4rem 1.25rem;
+    gap: .5rem 1.5rem;
+    margin: 1.5rem 0;
 }
 
 dt {
-    font-weight: 700;
+    color: var(--muted);
+    font-size: .875rem;
 }
 
 dd {
     margin: 0;
-    text-transform: capitalize;
+    font-weight: 500;
 }
 
+    dd:first-of-type {
+        text-transform: capitalize;
+    }
+
 .hint {
-    color: #666;
-    font-size: .9rem;
+    color: var(--muted);
+    font-size: .875rem;
 }

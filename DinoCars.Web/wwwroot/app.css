@@ -1,41 +1,76 @@
+/* ===== Dino Cars design tokens ===== */
 :root {
     --yellow: #ffc400;
-    --black: #111;
-    --heading-font: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+    --yellow-hover: #ffd43b;
+    --black: #121212;
+    --ink: #1f1f1f;
+    --muted: #6b6b6b;
+    --border: #e5e5e5;
+    --surface: #ffffff;
+    --bg: #f6f6f4;
+    --radius: 10px;
+    --brand-font: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --body-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 body {
     margin: 0;
-    background: #f4f4f4;
-    color: #222;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body-font);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
-    font-family: var(--heading-font);
-    font-style: italic;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: .5px;
+    font-family: var(--body-font);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.125rem;
 }
 
 .container {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 1.25rem;
 }
 
+/* Small uppercase label above headings */
+.eyebrow {
+    margin: 0;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #8a6d00;
+}
+
+/* ===== Buttons ===== */
 .btn {
     display: inline-block;
-    padding: .8rem 1.6rem;
-    border-radius: 6px;
-    font-family: var(--heading-font);
-    font-style: italic;
-    font-weight: 900;
-    font-size: 1.15rem;
-    text-transform: uppercase;
+    padding: .7rem 1.3rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: var(--body-font);
+    font-size: .95rem;
+    font-weight: 600;
+    line-height: 1.4;
     text-decoration: none;
-    border: 2px solid transparent;
+    cursor: pointer;
+    transition: background-color .15s, color .15s, border-color .15s;
 }
 
 .btn-yellow {
@@ -44,19 +79,111 @@ h1, h2, h3 {
 }
 
     .btn-yellow:hover {
-        background: #ffd23f;
+        background: var(--yellow-hover);
         color: var(--black);
     }
 
 .btn-outline {
-    border-color: #fff;
+    border-color: rgba(255, 255, 255, .5);
     color: #fff;
 }
 
     .btn-outline:hover {
         background: #fff;
+        border-color: #fff;
         color: var(--black);
     }
+
+/* ===== Forms ===== */
+.step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+    .step h2 {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        margin: 0 0 1.1rem;
+        font-size: 1.05rem;
+    }
+
+        .step h2 span {
+            display: inline-grid;
+            place-items: center;
+            width: 1.6rem;
+            height: 1.6rem;
+            border-radius: 50%;
+            background: var(--black);
+            color: var(--yellow);
+            font-size: .8rem;
+        }
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    font-size: .875rem;
+    font-weight: 500;
+}
+
+    .field.full, .field.notes {
+        grid-column: 1 / -1;
+        margin-top: 1rem;
+    }
+
+    .field input, .field textarea, .field select {
+        padding: .6rem .75rem;
+        border: 1px solid #d6d6d6;
+        border-radius: 8px;
+        background: #fff;
+        font: inherit;
+        font-size: .95rem;
+        font-weight: 400;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+        .field input:focus, .field textarea:focus, .field select:focus {
+            outline: none;
+            border-color: var(--black);
+            box-shadow: 0 0 0 3px rgba(255, 196, 0, .35);
+        }
+
+.validation-message {
+    color: #b42318;
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.hint {
+    color: var(--muted);
+    font-size: .875rem;
+}
+
+.error {
+    margin-bottom: 1rem;
+    padding: .75rem 1rem;
+    border: 1px solid #f5c2c0;
+    border-radius: 8px;
+    background: #fef3f2;
+    color: #b42318;
+    font-size: .9rem;
+}
+
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
 
 /* ---------- Shared form styles ---------- */
 .step {
