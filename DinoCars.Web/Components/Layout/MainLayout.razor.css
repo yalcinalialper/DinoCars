@@ -3,7 +3,7 @@
     top: 0;
     z-index: 10;
     background: var(--black);
-    border-bottom: 3px solid var(--yellow);
+    border-bottom: 2px solid var(--yellow);
 }
 
 .header-inner {
@@ -12,18 +12,19 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: .75rem;
-    padding-top: .75rem;
-    padding-bottom: .75rem;
+    min-height: 64px;
 }
 
 .logo {
-    font-family: var(--heading-font);
+    font-family: var(--brand-font);
     font-style: italic;
-    font-weight: 900;
-    font-size: 2rem;
+    font-weight: 800;
+    font-size: 1.65rem;
+    line-height: 1;
+    letter-spacing: .5px;
+    text-transform: uppercase;
     color: #fff;
     text-decoration: none;
-    letter-spacing: 1px;
 }
 
     .logo span {
@@ -34,39 +35,43 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1.25rem;
+    gap: 1.5rem;
 }
 
-    /* NavLink is a child component, so ::deep is needed to style its <a> */
     .main-nav ::deep a,
     .main-nav a,
     .logout button {
-        color: #fff;
-        font-weight: 600;
-        text-decoration: none;
-        background: none;
-        border: none;
         padding: 0;
+        border: none;
+        background: none;
+        color: rgba(255, 255, 255, .75);
+        font-family: inherit;
+        font-size: .9rem;
+        font-weight: 500;
+        text-decoration: none;
         cursor: pointer;
+        transition: color .15s;
     }
 
         .main-nav ::deep a:hover,
         .main-nav a:hover,
-        .logout button:hover {
-            color: var(--yellow);
+        .logout button:hover,
+        .main-nav ::deep a.active {
+            color: #fff;
         }
 
         .main-nav ::deep a.nav-cta {
+            padding: .5rem 1rem;
+            border-radius: 8px;
             background: var(--yellow);
             color: var(--black);
-            padding: .5rem 1rem;
-            border-radius: 6px;
-            font-family: var(--heading-font);
-            font-style: italic;
-            font-weight: 900;
-            font-size: 1.1rem;
-            text-transform: uppercase;
+            font-weight: 600;
         }
+
+            .main-nav ::deep a.nav-cta:hover {
+                background: var(--yellow-hover);
+                color: var(--black);
+            }
 
 .logout {
     margin: 0;
@@ -77,20 +82,29 @@ main {
 }
 
 .site-footer {
-    margin-top: 3rem;
+    margin-top: 4rem;
+    padding-top: 3rem;
     background: var(--black);
-    color: #ddd;
-    padding-top: 2.5rem;
-    border-top: 3px solid var(--yellow);
+    color: rgba(255, 255, 255, .7);
+    font-size: .9rem;
 }
 
     .site-footer h3 {
-        color: var(--yellow);
-        font-size: 1.3rem;
+        margin: 0 0 .9rem;
+        color: #fff;
+        font-size: .78rem;
+        font-weight: 600;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .site-footer p {
+        margin: .5rem 0 0;
     }
 
     .site-footer a {
-        color: #fff;
+        color: rgba(255, 255, 255, .85);
+        text-decoration: none;
     }
 
         .site-footer a:hover {
@@ -99,17 +113,17 @@ main {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2.5rem;
 }
 
 .footer-bottom {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    padding-bottom: 1.5rem;
-    border-top: 1px solid #333;
-    font-size: .85rem;
-    color: #999;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.75rem;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    font-size: .8rem;
+    color: rgba(255, 255, 255, .5);
 }
 
 #blazor-error-ui {

@@ -1,0 +1,28 @@
+﻿.whatsapp-fab {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .75rem 1.1rem;
+    border-radius: 999px;
+    background: #25d366;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+}
+
+    .whatsapp-fab:hover {
+        background: #1ebe5b;
+        color: #fff;
+    }
+
+@media (max-width: 600px) {
+    .whatsapp-fab span {
+        display: none;
+    }
+    /* icon only on phones */
+}

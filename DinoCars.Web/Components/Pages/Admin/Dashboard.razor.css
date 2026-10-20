@@ -1,5 +1,5 @@
 ﻿.admin {
-    padding-top: 1.5rem;
+    padding-top: 2rem;
     padding-bottom: 2rem;
 }
 
@@ -7,57 +7,74 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
     .title-row h1 {
         margin: 0;
-        font-size: 2.6rem;
+        font-size: 1.75rem;
     }
 
+.title-actions {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
 .panel {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }
 
     .panel h2 {
-        font-size: 1.6rem;
-        margin: 0 0 .75rem;
+        display: flex;
+        align-items: center;
+        margin: 0 0 1rem;
+        font-size: 1.1rem;
         text-transform: capitalize;
     }
 
 .count {
     display: inline-grid;
     place-items: center;
-    min-width: 1.8rem;
-    height: 1.8rem;
-    margin-left: .4rem;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    margin-left: .5rem;
+    padding: 0 .4rem;
     border-radius: 999px;
     background: var(--yellow);
     color: var(--black);
-    font-style: normal;
-    font-size: 1rem;
+    font-size: .75rem;
+    font-weight: 700;
 }
 
 .day-nav {
     display: flex;
     align-items: center;
-    gap: .75rem;
-    margin-bottom: .75rem;
+    gap: .5rem;
+    margin-bottom: 1rem;
 }
 
     .day-nav h2 {
+        min-width: 240px;
         margin: 0;
-        min-width: 260px;
         text-align: center;
     }
 
     .day-nav button, .refresh {
-        border: 2px solid var(--black);
+        padding: .45rem .85rem;
+        border: 1px solid #d6d6d6;
+        border-radius: 8px;
         background: #fff;
-        border-radius: 6px;
-        padding: .3rem .8rem;
-        font-weight: 700;
+        font-family: inherit;
+        font-size: .875rem;
+        font-weight: 500;
         cursor: pointer;
     }
+
+        .day-nav button:hover, .refresh:hover {
+            border-color: var(--black);
+        }
 
         .day-nav button:disabled, .refresh:disabled {
             opacity: .5;
@@ -65,23 +82,14 @@
         }
 
 .today {
-    background: var(--yellow) !important;
+    border-color: var(--yellow) !important;
+    background: #fffaeb !important;
 }
 
 .hint {
-    color: #666;
+    color: var(--muted);
 }
 
 .error {
     margin-top: 1rem;
-    padding: .75rem;
-    border-radius: 6px;
-    background: #fde8e8;
-    color: #a00;
-}
-
-.title-actions {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
 }

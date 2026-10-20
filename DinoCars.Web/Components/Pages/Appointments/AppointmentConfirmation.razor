@@ -36,7 +36,13 @@
         </dl>
 
         <p class="hint">Bewaar deze pagina: via deze link kunt u uw afspraak altijd terugvinden.</p>
-        <p class="hint">Vragen? Bel ons op +32 491 88 88 24.</p>
+        <p>
+            <a class="btn btn-yellow" target="_blank" rel="noopener"
+               href="@WhatsAppLink.Create(GarageInfo.Phone, QuestionMessage)">
+                Vraag over deze afspraak? WhatsApp ons
+            </a>
+        </p>
+        <p class="hint">Of bel ons op <a href="@GarageInfo.PhoneLink">@GarageInfo.Phone</a>.</p>
     }
 </section>
 
@@ -65,4 +71,10 @@
         ReservationStatus.Completed => "Afgerond",
         _ => status.ToString()
     };
+
+    private string QuestionMessage => _reservation is null
+    ? ""
+    : $"Hallo Dino Cars, ik heb een vraag over mijn afspraak op " +
+      $"{ToLocal(_reservation.StartUtc).ToString("dddd d MMMM 'om' HH:mm", Dutch)} " +
+      $"({_reservation.Vehicle.LicensePlate}).";
 }

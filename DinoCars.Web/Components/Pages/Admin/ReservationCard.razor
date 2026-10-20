@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using DinoCars.AppLogic.Reservations.Admin
 @using DinoCars.Domain.Enums
+@inject NavigationManager Navigation
 
 <article class="card status-@Reservation.Status.ToString().ToLowerInvariant()">
     <header>
@@ -44,11 +45,14 @@
                 <button class="approve" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Approve)">Goedkeuren</button>
                 <button class="reject" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Reject)">Weigeren</button>
             }
-            else
+            else if (Reservation.Status == ReservationStatus.Approved)
             {
                 <button class="approve" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Complete)">Afgerond</button>
                 <button class="reject" disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(ReservationAction.Cancel)">Annuleren</button>
             }
+
+            <a class="whatsapp" href="@WhatsAppLink.Create(Reservation.Phone, WhatsAppMessage)"
+               target="_blank" rel="noopener">WhatsApp klant</a>
         </footer>
     }
 </article>
@@ -76,5 +80,28 @@
         ReservationSource.WhatsApp => "WhatsApp",
         ReservationSource.WalkIn => "langs geweest",
         _ => ""
+    };
+
+    private string CustomerLink => $"{Navigation.BaseUri}afspraak/{Reservation.AccessToken}";
+
+    private string When =>
+        $"{Reservation.StartLocal.ToString("dddd d MMMM", Dutch)} om {Reservation.StartLocal:HH:mm}";
+
+    private string WhatsAppMessage => Reservation.Status switch
+    {
+        ReservationStatus.Approved =>
+            $"Hallo {Reservation.CustomerName}, uw afspraak bij {GarageInfo.Name} op {When} " +
+            $"({Reservation.LicensePlate}) is bevestigd. Tot dan! Details: {CustomerLink}",
+
+        ReservationStatus.Rejected =>
+            $"Hallo {Reservation.CustomerName}, helaas kunnen we uw afspraak op {When} niet inplannen. " +
+            $"Zullen we samen een ander moment zoeken?",
+
+        ReservationStatus.Cancelled =>
+            $"Hallo {Reservation.CustomerName}, uw afspraak bij {GarageInfo.Name} op {When} is geannuleerd.",
+
+        _ =>
+            $"Hallo {Reservation.CustomerName}, hier {GarageInfo.Name} over uw afspraak op {When} " +
+            $"({Reservation.LicensePlate})."
     };
 }
