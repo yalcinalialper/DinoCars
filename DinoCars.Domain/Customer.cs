@@ -31,7 +31,7 @@ namespace DinoCars.Domain
             CreatedAtUtc = createdAtUtc;
         }
 
-        public Vehicle AddVehicle(string make, string model, string licensePlate, string vin)
+        public Vehicle AddVehicle(string make, string model, string licensePlate, string? vin)
         {
             var vehicle = new Vehicle(Id, make, model, licensePlate, vin);
             _vehicles.Add(vehicle);
