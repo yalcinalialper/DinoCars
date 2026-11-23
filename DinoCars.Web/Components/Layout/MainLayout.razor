@@ -1,11 +1,16 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @using DinoCars.Infrastructure.Identity
 
 <header class="site-header">
     <div class="container header-inner">
         <a href="/" class="logo">DINO <span>CARS</span></a>
 
-        <nav class="main-nav">
+        @* Mobile menu: a hidden checkbox + its label open and close the menu without JavaScript.
+           (wwwroot/js/nav.js only closes it again after a link is tapped.) *@
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Menu openen of sluiten" />
+        <label for="nav-toggle" class="nav-toggle-label" aria-hidden="true"><span></span></label>
+
+        <nav class="main-nav" aria-label="Hoofdmenu">
             <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
             <a href="/#diensten">Diensten</a>
             <a href="/#contact">Contact</a>
@@ -22,11 +27,11 @@
                         <button type="submit">Uitloggen</button>
                     </form>
                 </Authorized>
-
             </AuthorizeView>
-
-            <NavLink href="afspraak" class="nav-cta">Afspraak maken</NavLink>
         </nav>
+
+        @* Outside the menu, so it's always visible, also on phones *@
+        <NavLink href="afspraak" class="nav-cta">Afspraak maken</NavLink>
     </div>
 </header>
 
@@ -44,9 +49,8 @@
         <div>
             <h3>Contact</h3>
             <p>
-                <a href="tel:+32491888824">+32 491 88 88 24</a><br />
-                <a href="mailto:hawar.dino@gmail.com">hawar.dino@gmail.com</a><br />
-                @* TODO: confirm house number with Dino (posters say both 1227 and 1224) *@
+                <a href="@GarageInfo.PhoneLink">@GarageInfo.Phone</a><br />
+                <a href="mailto:@GarageInfo.Email">@GarageInfo.Email</a><br />
                 <a href="https://www.google.com/maps/search/?api=1&query=Kolmenstraat+1227+3570+Alken"
                    target="_blank" rel="noopener">Kolmenstraat 1227, 3570 Alken</a>
             </p>
@@ -59,7 +63,7 @@
     </div>
 
     <div class="container footer-bottom">
-        © @DateTime.Now.Year Dino Cars · <a href="Account/Login">Login personeel</a>
+        © @DateTime.Now.Year @GarageInfo.Name · <a href="Account/Login">Login personeel</a>
     </div>
 </footer>
 

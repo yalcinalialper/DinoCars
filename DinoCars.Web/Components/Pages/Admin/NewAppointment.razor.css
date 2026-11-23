@@ -1,36 +1,35 @@
-﻿.new-appointment {
+/* ===== Staff: new appointment (mobile first) ===== */
+.new-appointment {
     max-width: 820px;
-    padding-top: 2rem;
+    padding-top: 1.25rem;
     padding-bottom: 2rem;
 }
 
+/* Phones: "← Terug naar beheer" above the title */
 .title-row {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: .25rem;
+    margin-bottom: 1rem;
+}
+
+.title-row h1 { margin: 0; font-size: 1.5rem; }
+
+.title-row a {
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 1.25rem;
+    min-height: 36px;
+    color: var(--muted);
+    font-size: .9rem;
+    text-decoration: none;
 }
 
-    .title-row h1 {
-        margin: 0;
-        font-size: 1.75rem;
-    }
-
-    .title-row a {
-        color: var(--muted);
-        font-size: .9rem;
-        text-decoration: none;
-    }
-
-        .title-row a:hover {
-            color: var(--ink);
-        }
-
-.field.source {
-    max-width: 320px;
-}
+.field.source { width: 100%; }
 
 .save {
+    width: 100%;
+    min-height: 48px;
     padding: .8rem 1.6rem;
     border: none;
     border-radius: 8px;
@@ -40,13 +39,30 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
+    transition: background-color .15s;
 }
 
-    .save:hover {
-        background: var(--yellow-hover);
+.save:disabled { opacity: .6; cursor: default; }
+
+@media (hover: hover) {
+    .title-row a:hover { color: var(--ink); }
+    .save:hover:not(:disabled) { background: var(--yellow-hover); }
+}
+
+/* ===== Tablet and up ===== */
+@media (min-width: 640px) {
+    .new-appointment { padding-top: 2rem; }
+
+    .title-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
     }
 
-    .save:disabled {
-        opacity: .6;
-        cursor: default;
-    }
+    .title-row h1 { font-size: 1.75rem; }
+
+    .field.source { max-width: 320px; }
+
+    .save { width: auto; }
+}
