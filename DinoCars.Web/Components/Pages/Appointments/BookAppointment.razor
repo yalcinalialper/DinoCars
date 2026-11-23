@@ -77,6 +77,14 @@
             </div>
         </div>
 
+        @* Honeypot against spam bots: invisible for visitors and skipped by screen readers and the Tab key *@
+        <div class="hp-field" aria-hidden="true">
+            <label>
+                Website
+                <InputText @bind-Value="_form.Website" tabindex="-1" autocomplete="off" />
+            </label>
+        </div>
+
         @if (_errorMessage is not null)
         {
             <div class="error">@_errorMessage</div>
@@ -86,6 +94,10 @@
             @(_submitting ? "Bezig…" : "Afspraak aanvragen")
         </button>
         <p class="hint">De garage bekijkt uw aanvraag en bevestigt ze zo snel mogelijk.</p>
+        <p class="hint">
+            We gebruiken uw gegevens alleen om uw afspraak in te plannen en u daarover te contacteren.
+            Meer info in onze <a href="privacy">privacyverklaring</a>.
+        </p>
     </EditForm>
 </section>
 
@@ -97,11 +109,22 @@
     private bool _submitting;
     private string? _errorMessage;
 
+    // Anti-spam: nobody fills in this whole form within a few seconds, bots do.
+    private static readonly TimeSpan MinimumTimeToFillIn = TimeSpan.FromSeconds(3);
+    private readonly DateTime _formShownAtUtc = DateTime.UtcNow;
+
     private bool RequiresNotes => _selected.Any(s => s.Code == ServiceType.OtherCode);
 
     private async Task SubmitAsync()
     {
         _errorMessage = null;
+
+        // Looks like a bot: hidden field filled in, or the form was sent suspiciously fast.
+        if (!string.IsNullOrEmpty(_form.Website) || DateTime.UtcNow - _formShownAtUtc < MinimumTimeToFillIn)
+        {
+            _errorMessage = "Er ging iets mis bij het versturen. Probeer het opnieuw of bel ons even.";
+            return;
+        }
 
         if (_selected.Count == 0) { _errorMessage = "Kies minstens één dienst."; return; }
         if (_selectedSlot is null) { _errorMessage = "Kies een datum en een uur."; return; }

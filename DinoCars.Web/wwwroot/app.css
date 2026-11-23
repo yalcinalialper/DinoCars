@@ -189,6 +189,15 @@ h1:focus { outline: none; }
     font-size: .9rem;
 }
 
+/* Honeypot field against spam bots: moved off-screen, so people never see it */
+.hp-field {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
 /* Blazor/Identity validation outlines (from the template) */
 .valid.modified:not([type=checkbox]) { outline: 1px solid #26b050; }
 .invalid { outline: 1px solid #e50000; }

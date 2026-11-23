@@ -1,11 +1,14 @@
 using DinoCars.AppLogic;
 using DinoCars.AppLogic.Availability;
+using DinoCars.AppLogic.Reservations;
 using DinoCars.Infrastructure;
 using DinoCars.Infrastructure.Data;
 using DinoCars.Infrastructure.Identity;
 using DinoCars.Web.Components;
 using DinoCars.Web.Components.Account;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +30,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.Configure<WorkshopOptions>(builder.Configuration.GetSection(WorkshopOptions.SectionName));
+builder.Services.Configure<BookingProtectionOptions>(builder.Configuration.GetSection(BookingProtectionOptions.SectionName));
 builder.Services.AddApplogic();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -49,11 +53,39 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+// Behind Azure App Service the app sits behind a reverse proxy. These headers tell the app
+// the visitor's real IP address and that the original request was HTTPS.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+// Rate limiting: each visitor (IP address) may make at most 300 requests per minute.
+// A normal visit uses a few dozen, so only floods and bots notice this limit.
+// (300 and not lower, because on mobile networks many people can share one IP address.)
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 300,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
+
 var app = builder.Build();
 
 await IdentitySeeder.SeedAsync(app.Services, app.Configuration);
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -66,6 +98,7 @@ else
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 
 app.UseAntiforgery();
 
