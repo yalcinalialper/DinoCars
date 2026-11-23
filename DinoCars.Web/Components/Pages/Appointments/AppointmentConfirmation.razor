@@ -9,7 +9,8 @@
 @inject IReservationRepository Reservations
 @inject IOptions<WorkshopOptions> WorkshopOptions
 
-<PageTitle>Uw afspraak – Dino Cars</PageTitle>
+@* NoIndex: this page contains personal appointment details and must never appear in Google *@
+<Seo Title="Uw afspraak – Dino Cars" NoIndex="true" />
 
 <section class="confirmation">
     @if (_reservation is null)
