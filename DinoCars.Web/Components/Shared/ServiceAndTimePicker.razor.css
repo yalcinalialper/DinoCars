@@ -1,64 +1,74 @@
-﻿.services {
+/* ===== Service + time picker (mobile first) ===== */
+
+/* Phones: one service per row, big tap targets */
+.services {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: 1fr;
     gap: .5rem;
 }
 
 .service {
     display: flex;
     align-items: center;
-    gap: .6rem;
-    padding: .7rem .85rem;
+    gap: .75rem;
+    min-height: var(--tap);
+    padding: .6rem .85rem;
     border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: .925rem;
+    font-size: .95rem;
     cursor: pointer;
     transition: border-color .15s, background-color .15s;
 }
 
-    .service:hover {
-        border-color: #cfcfcf;
-    }
-
-    .service.selected {
-        border-color: var(--yellow);
-        background: #fffaeb;
-    }
-
-    .service input {
-        accent-color: var(--black);
-    }
-
-.field.date {
-    max-width: 220px;
+.service input {
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0;
+    accent-color: var(--black);
 }
 
+.service.selected { border-color: var(--yellow); background: #fffaeb; }
+
+.field.date { width: 100%; }
+
+/* Phones: an even grid of time buttons that fills the width */
 .slots {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
     gap: .5rem;
     margin-top: 1rem;
 }
 
 .slot {
-    min-width: 4.5rem;
-    padding: .5rem .9rem;
+    min-height: var(--tap);
+    padding: 0 .75rem;
     border: 1px solid #d6d6d6;
     border-radius: 8px;
     background: #fff;
+    color: var(--ink);
     font-family: inherit;
-    font-size: .9rem;
+    font-size: .95rem;
     font-weight: 500;
     cursor: pointer;
     transition: border-color .15s, background-color .15s;
 }
 
-    .slot:hover {
-        border-color: var(--black);
-    }
+.slot.selected { border-color: var(--yellow); background: var(--yellow); font-weight: 600; }
 
-    .slot.selected {
-        border-color: var(--yellow);
-        background: var(--yellow);
-        font-weight: 600;
-    }
+@media (hover: hover) {
+    .service:hover { border-color: #cfcfcf; }
+    .service.selected:hover { border-color: var(--yellow); }
+    .slot:hover { border-color: var(--black); }
+    .slot.selected:hover { border-color: var(--yellow); }
+}
+
+/* ===== Tablet and up ===== */
+@media (min-width: 640px) {
+    .services { grid-template-columns: repeat(2, 1fr); }
+
+    .field.date { max-width: 240px; }
+
+    .slots { display: flex; flex-wrap: wrap; }
+    .slot { min-width: 4.75rem; }
+}

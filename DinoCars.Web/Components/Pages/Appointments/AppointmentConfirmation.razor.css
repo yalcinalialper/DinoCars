@@ -1,40 +1,44 @@
-﻿.confirmation {
-    max-width: 640px;
-    margin: 3rem auto;
-    padding: 2rem;
+/* ===== Confirmation page (mobile first) ===== */
+.confirmation {
+    margin: 1.5rem 1rem 2rem;
+    padding: 1.5rem 1.25rem;
     border: 1px solid var(--border);
     border-top: 4px solid var(--yellow);
     border-radius: var(--radius);
     background: var(--surface);
 }
 
-    .confirmation h1 {
-        margin: 0 0 .5rem;
-        font-size: 1.5rem;
-    }
+.confirmation h1 { margin: 0 0 .5rem; font-size: 1.35rem; }
 
+/* Phones: label above value */
 dl {
     display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: .5rem 1.5rem;
-    margin: 1.5rem 0;
+    grid-template-columns: 1fr;
+    gap: .1rem;
+    margin: 1.25rem 0;
 }
 
-dt {
-    color: var(--muted);
-    font-size: .875rem;
-}
+dt { margin-top: .65rem; color: var(--muted); font-size: .8rem; }
+dt:first-child { margin-top: 0; }
+dd { margin: 0; font-weight: 500; }
+dd:first-of-type { text-transform: capitalize; }
 
-dd {
-    margin: 0;
-    font-weight: 500;
-}
+.confirmation .btn { width: 100%; }
 
-    dd:first-of-type {
-        text-transform: capitalize;
+.hint { color: var(--muted); font-size: .875rem; }
+
+/* ===== Tablet and up: label and value side by side ===== */
+@media (min-width: 640px) {
+    .confirmation {
+        max-width: 640px;
+        margin: 3rem auto;
+        padding: 2rem;
     }
 
-.hint {
-    color: var(--muted);
-    font-size: .875rem;
+    .confirmation h1 { font-size: 1.5rem; }
+
+    dl { grid-template-columns: max-content 1fr; gap: .5rem 1.5rem; margin: 1.5rem 0; }
+    dt { margin-top: 0; font-size: .875rem; }
+
+    .confirmation .btn { width: auto; }
 }

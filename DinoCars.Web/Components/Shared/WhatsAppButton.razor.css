@@ -1,28 +1,62 @@
-﻿.whatsapp-fab {
+/* ===== Floating WhatsApp button (mobile first) ===== */
+
+/* Phones: a round icon button, clear of the iPhone home bar */
+.whatsapp-fab {
     position: fixed;
-    right: 1.25rem;
-    bottom: 1.25rem;
+    right: calc(1rem + env(safe-area-inset-right, 0px));
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
     z-index: 50;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    padding: .75rem 1.1rem;
-    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
     background: #25d366;
     color: #fff;
-    font-weight: 700;
     text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+    transition: background-color .15s;
 }
 
-    .whatsapp-fab:hover {
-        background: #1ebe5b;
-        color: #fff;
+.whatsapp-fab svg { width: 26px; height: 26px; }
+
+/* The text stays available for screen readers, but is hidden on phones */
+.whatsapp-fab span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+@media (hover: hover) {
+    .whatsapp-fab:hover { background: #1ebe5b; color: #fff; }
+}
+
+/* ===== Tablet and up: a pill with text ===== */
+@media (min-width: 640px) {
+    .whatsapp-fab {
+        right: 1.5rem;
+        bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        width: auto;
+        height: auto;
+        padding: .75rem 1.15rem;
+        border-radius: 999px;
+        font-size: .9rem;
+        font-weight: 600;
     }
 
-@media (max-width: 600px) {
+    .whatsapp-fab svg { width: 22px; height: 22px; }
+
     .whatsapp-fab span {
-        display: none;
+        position: static;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        clip: auto;
     }
-    /* icon only on phones */
 }

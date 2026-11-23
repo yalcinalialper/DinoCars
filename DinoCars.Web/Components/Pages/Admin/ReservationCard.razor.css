@@ -1,6 +1,7 @@
-﻿.card {
+/* ===== Reservation card (mobile first) ===== */
+.card {
     margin-bottom: .75rem;
-    padding: 1.1rem 1.25rem;
+    padding: 1rem;
     border: 1px solid var(--border);
     border-left: 4px solid #cfcfcf;
     border-radius: var(--radius);
@@ -8,29 +9,18 @@
     font-size: .925rem;
 }
 
-.status-requested {
-    border-left-color: var(--yellow);
-}
+.status-requested { border-left-color: var(--yellow); }
+.status-approved { border-left-color: #12b76a; }
+.status-completed { border-left-color: #98a2b3; opacity: .8; }
+.status-rejected, .status-cancelled { border-left-color: #f04438; opacity: .65; }
 
-.status-approved {
-    border-left-color: #12b76a;
-}
-
-.status-completed {
-    border-left-color: #98a2b3;
-    opacity: .8;
-}
-
-.status-rejected, .status-cancelled {
-    border-left-color: #f04438;
-    opacity: .65;
-}
-
+/* Phones: date + badge on the first line, "via telefoon" on its own line below */
 header {
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
-    gap: .5rem;
+    justify-content: space-between;
+    align-items: center;
+    gap: .35rem .5rem;
     margin-bottom: .75rem;
 }
 
@@ -41,32 +31,31 @@ header {
     color: var(--ink);
     font-size: .75rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
-.status-requested .badge {
-    background: #fff4cc;
-}
-
-.status-approved .badge {
-    background: #d1fadf;
-    color: #05603a;
-}
+.status-requested .badge { background: #fff4cc; }
+.status-approved .badge { background: #d1fadf; color: #05603a; }
 
 .source {
-    margin-left: auto;
+    order: 3;
+    flex-basis: 100%;
     color: var(--muted);
     font-size: .8rem;
 }
 
+/* Phones: customer, vehicle and services stacked */
 .details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: .75rem;
+    grid-template-columns: 1fr;
+    gap: .6rem;
 }
 
-    .details a {
-        color: inherit;
-    }
+.details a {
+    display: inline-block;
+    padding: .15rem 0; /* easier to tap the phone number / email */
+    color: inherit;
+}
 
 .plate {
     padding: 0 .35rem;
@@ -76,6 +65,7 @@ header {
     font-family: ui-monospace, Consolas, monospace;
     font-size: .85rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .notes {
@@ -87,6 +77,7 @@ header {
     font-size: .875rem;
 }
 
+/* Phones: two buttons side by side, WhatsApp full width below */
 footer {
     display: flex;
     flex-wrap: wrap;
@@ -94,47 +85,62 @@ footer {
     margin-top: 1rem;
 }
 
-    footer button, .whatsapp {
-        padding: .45rem .95rem;
-        border: 1px solid #d6d6d6;
-        border-radius: 8px;
-        background: #fff;
-        font-family: inherit;
-        font-size: .85rem;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background-color .15s, border-color .15s;
-    }
-
-        footer button:disabled {
-            opacity: .5;
-            cursor: default;
-        }
-
-.approve {
-    border-color: var(--yellow);
-    background: var(--yellow);
-    color: var(--black);
+footer button, .whatsapp {
+    display: inline-flex;
+    flex: 1 1 calc(50% - .25rem);
+    align-items: center;
+    justify-content: center;
+    min-height: var(--tap);
+    padding: 0 .95rem;
+    border: 1px solid #d6d6d6;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s;
 }
 
-    .approve:hover {
-        background: var(--yellow-hover);
-    }
+footer button:disabled { opacity: .5; cursor: default; }
 
-.reject:hover {
-    border-color: #f04438;
-    color: #b42318;
-}
+.approve { border-color: var(--yellow); background: var(--yellow); color: var(--black); }
 
 .whatsapp {
-    margin-left: auto;
+    flex-basis: 100%;
     border-color: #25d366;
     background: #25d366;
     color: #fff;
 }
 
-    .whatsapp:hover {
-        background: #1ebe5b;
-        color: #fff;
+@media (hover: hover) {
+    .approve:hover:not(:disabled) { background: var(--yellow-hover); }
+    .reject:hover:not(:disabled) { border-color: #f04438; color: #b42318; }
+    .whatsapp:hover { background: #1ebe5b; color: #fff; }
+}
+
+/* ===== Tablet and up ===== */
+@media (min-width: 640px) {
+    .card { padding: 1.1rem 1.25rem; }
+
+    .source {
+        order: 0;
+        flex-basis: auto;
+        margin-left: auto;
     }
+
+    .details {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: .75rem;
+    }
+
+    footer button, .whatsapp {
+        flex: 0 0 auto;
+        min-height: 38px;
+        font-size: .85rem;
+    }
+
+    .whatsapp { margin-left: auto; }
+}

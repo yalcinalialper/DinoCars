@@ -1,19 +1,21 @@
-﻿.opening-hours {
+.opening-hours {
+    width: 100%;
+    max-width: 300px;
     border-collapse: collapse;
+    font-size: .9rem;
 }
 
-    .opening-hours th {
-        text-align: left;
-        font-weight: 600;
-        padding: .15rem 1.25rem .15rem 0;
-        text-transform: capitalize;
-    }
-
-    .opening-hours td {
-        padding: .15rem 0;
-    }
-
-.closed {
-    color: #ff6b6b;
-    font-weight: 700;
+.opening-hours th {
+    padding: .2rem 1rem .2rem 0;
+    font-weight: 600;
+    text-align: left;
+    text-transform: capitalize;
 }
+
+.opening-hours td {
+    padding: .2rem 0;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.closed { color: #ff6b6b; font-weight: 700; }

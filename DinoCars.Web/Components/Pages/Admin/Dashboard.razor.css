@@ -1,38 +1,27 @@
-﻿.admin {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-}
+/* ===== Staff dashboard (mobile first) ===== */
+.admin { padding-top: 1.25rem; padding-bottom: 2rem; }
 
+/* Phones: title on top, action buttons below it */
 .title-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    flex-direction: column;
+    gap: .75rem;
 }
 
-    .title-row h1 {
-        margin: 0;
-        font-size: 1.75rem;
-    }
+.title-row h1 { margin: 0; font-size: 1.5rem; }
 
-.title-actions {
+.title-actions { display: flex; gap: .5rem; }
+.title-actions .btn { flex: 1; }
+
+.panel { margin-top: 1.75rem; }
+
+.panel h2 {
     display: flex;
     align-items: center;
-    gap: .6rem;
+    margin: 0 0 .85rem;
+    font-size: 1.05rem;
+    text-transform: capitalize;
 }
-
-.panel {
-    margin-top: 2rem;
-}
-
-    .panel h2 {
-        display: flex;
-        align-items: center;
-        margin: 0 0 1rem;
-        font-size: 1.1rem;
-        text-transform: capitalize;
-    }
 
 .count {
     display: inline-grid;
@@ -48,48 +37,70 @@
     font-weight: 700;
 }
 
+/* Phones:  ‹  maandag 23 november  ›
+            [        Vandaag        ]  */
 .day-nav {
-    display: flex;
+    display: grid;
+    grid-template-columns: var(--tap) 1fr var(--tap);
     align-items: center;
     gap: .5rem;
     margin-bottom: 1rem;
 }
 
-    .day-nav h2 {
-        min-width: 240px;
-        margin: 0;
-        text-align: center;
-    }
-
-    .day-nav button, .refresh {
-        padding: .45rem .85rem;
-        border: 1px solid #d6d6d6;
-        border-radius: 8px;
-        background: #fff;
-        font-family: inherit;
-        font-size: .875rem;
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-        .day-nav button:hover, .refresh:hover {
-            border-color: var(--black);
-        }
-
-        .day-nav button:disabled, .refresh:disabled {
-            opacity: .5;
-            cursor: default;
-        }
-
-.today {
-    border-color: var(--yellow) !important;
-    background: #fffaeb !important;
+.day-nav h2 {
+    justify-content: center;
+    margin: 0;
+    font-size: 1rem;
+    text-align: center;
 }
 
-.hint {
-    color: var(--muted);
+.day-nav .today { grid-column: 1 / -1; }
+
+.day-nav button, .refresh {
+    min-height: var(--tap);
+    padding: 0 .85rem;
+    border: 1px solid #d6d6d6;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
 }
 
-.error {
-    margin-top: 1rem;
+.day-nav button:disabled, .refresh:disabled { opacity: .5; cursor: default; }
+
+.today { border-color: var(--yellow) !important; background: #fffaeb !important; }
+
+.hint { color: var(--muted); }
+.error { margin-top: 1rem; }
+
+@media (hover: hover) {
+    .day-nav button:hover:not(:disabled),
+    .refresh:hover:not(:disabled) { border-color: var(--black); }
+}
+
+/* ===== Tablet and up ===== */
+@media (min-width: 640px) {
+    .admin { padding-top: 2rem; }
+
+    .title-row {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .title-row h1 { font-size: 1.75rem; }
+
+    .title-actions .btn { flex: 0 0 auto; }
+
+    .panel { margin-top: 2rem; }
+    .panel h2 { font-size: 1.1rem; }
+
+    .day-nav { display: flex; }
+    .day-nav h2 { min-width: 240px; }
+    .day-nav .today { grid-column: auto; }
 }
