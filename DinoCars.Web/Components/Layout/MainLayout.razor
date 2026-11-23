@@ -51,8 +51,7 @@
             <p>
                 <a href="@GarageInfo.PhoneLink">@GarageInfo.Phone</a><br />
                 <a href="mailto:@GarageInfo.Email">@GarageInfo.Email</a><br />
-                <a href="https://www.google.com/maps/search/?api=1&query=Kolmenstraat+1227+3570+Alken"
-                   target="_blank" rel="noopener">Kolmenstraat 1227, 3570 Alken</a>
+                <a href="@GarageInfo.MapsLink" target="_blank" rel="noopener">@GarageInfo.Address</a>
             </p>
         </div>
 
@@ -63,7 +62,7 @@
     </div>
 
     <div class="container footer-bottom">
-        © @DateTime.Now.Year @GarageInfo.Name · <a href="Account/Login">Login personeel</a>
+        © @DateTime.Now.Year @GarageInfo.Name · <a href="privacy">Privacy</a> · <a href="Account/Login">Login personeel</a>
     </div>
 </footer>
 
