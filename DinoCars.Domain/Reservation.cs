@@ -39,24 +39,24 @@ namespace DinoCars.Domain
             ArgumentNullException.ThrowIfNull(serviceTypes, nameof(serviceTypes));
 
             if (serviceTypes.Count == 0)
-                throw new DomainException("Select at least one service.");
+                throw new DomainException("Kies minstens één dienst.");
 
             if (serviceTypes.Any(s => !s.IsActive))
-                throw new DomainException("One of the selected services is no longer available.");
+                throw new DomainException("Een van de gekozen diensten is niet meer beschikbaar.");
 
             if (startUtc <= nowUtc)
-                throw new DomainException("A reservation must be in the future.");
+                throw new DomainException("Een afspraak moet in de toekomst liggen.");
 
             if (mileage < 0)
-                throw new DomainException("Mileage cannot be negative.");
+                throw new DomainException("De kilometerstand kan niet negatief zijn.");
 
             var notes = string.IsNullOrWhiteSpace(customerNotes) ? null : customerNotes.Trim();
 
             if (serviceTypes.Any(s => s.Code == ServiceType.OtherCode) && notes is null)
-                throw new DomainException("Please describe the problem when selecting 'Other'.");
+                throw new DomainException("Omschrijf het probleem wanneer u 'Overige' kiest.");
 
             if (notes?.Length > MaxNotesLength)
-                throw new DomainException($"Notes cannot be longer than {MaxNotesLength} characters.");
+                throw new DomainException($"Opmerkingen mogen maximaal {MaxNotesLength} tekens lang zijn.");
 
             var reservation = new Reservation
             {
@@ -101,7 +101,7 @@ namespace DinoCars.Domain
         private void TransitionTo(ReservationStatus target, params ReservationStatus[] from)
         {
             if (!from.Contains(Status))
-                throw new DomainException($"Cannot change a reservation from {Status} to {target}.");
+                throw new DomainException("Deze afspraak is intussen al gewijzigd. Vernieuw de pagina en probeer opnieuw.");
 
             Status = target;
         }

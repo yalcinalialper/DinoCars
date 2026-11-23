@@ -43,6 +43,20 @@ namespace DinoCars.Infrastructure.Repositories
                 .OrderBy(r => r.StartUtc)
                 .ToListAsync(cancellationToken);
 
+        public Task<int> CountUpcomingForPhoneAsync(string phone, DateTime fromUtc, CancellationToken cancellationToken = default)
+        {
+            var normalized = phone.Trim();
+
+            return context.Reservations.CountAsync(r =>
+                r.Vehicle.Customer.MobilePhoneNumber == normalized &&
+                r.EndUtc > fromUtc &&
+                (r.Status == ReservationStatus.Requested || r.Status == ReservationStatus.Approved),
+                cancellationToken);
+        }
+
+        public Task<int> CountCreatedSinceAsync(ReservationSource source, DateTime sinceUtc, CancellationToken cancellationToken = default) =>
+            context.Reservations.CountAsync(r => r.Source == source && r.CreatedAtUtc >= sinceUtc, cancellationToken);
+
         public void Add(Reservation reservation) => context.Reservations.Add(reservation);
     }
 }

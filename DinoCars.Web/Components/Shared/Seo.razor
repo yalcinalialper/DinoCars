@@ -1,0 +1,44 @@
+@*
+    SEO tags for one page: title, description, canonical URL and social-media preview (Open Graph,
+    used by WhatsApp and Facebook when someone shares a link).
+    Use it instead of <PageTitle>. Extra head content (like structured data) can go between the tags.
+    Pages that should not appear in Google (confirmation, back office) use NoIndex="true".
+*@
+@inject NavigationManager Navigation
+
+<PageTitle>@Title</PageTitle>
+
+<HeadContent>
+    @if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <meta name="description" content="@Description" />
+        <meta property="og:description" content="@Description" />
+    }
+
+    @if (NoIndex)
+    {
+        <meta name="robots" content="noindex, nofollow" />
+    }
+    else
+    {
+        <link rel="canonical" href="@CanonicalUrl" />
+        <meta property="og:url" content="@CanonicalUrl" />
+    }
+
+    <meta property="og:title" content="@Title" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@GarageInfo.Name" />
+    <meta property="og:locale" content="nl_BE" />
+
+    @ChildContent
+</HeadContent>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public bool NoIndex { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    // The page address without ?query or #fragment: one "official" URL per page for Google.
+    private string CanonicalUrl => new Uri(Navigation.Uri).GetLeftPart(UriPartial.Path);
+}

@@ -24,6 +24,10 @@ namespace DinoCars.Infrastructure
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
 
+            // GDPR: daily clean-up of customer data older than the retention period.
+            services.Configure<DataRetentionOptions>(configuration.GetSection(DataRetentionOptions.SectionName));
+            services.AddHostedService<DataRetentionService>();
+
 
             return services;
         }

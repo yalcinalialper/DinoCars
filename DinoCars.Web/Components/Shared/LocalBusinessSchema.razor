@@ -1,0 +1,51 @@
+@*
+    Structured data (JSON-LD, schema.org "AutoRepair"): tells Google in a machine-readable way that this is
+    a garage, with its address, phone number and opening hours. Google can show this in search results and Maps.
+    The opening hours come from the same "Workshop" settings as the booking system, so they always match.
+*@
+@using System.Text.Json
+@using DinoCars.AppLogic.Availability
+@using Microsoft.Extensions.Options
+@inject IOptions<WorkshopOptions> WorkshopOptions
+@inject NavigationManager Navigation
+
+@* Blazor doesn't allow a literal <script> tag in a component, so it's rendered as markup.
+   JsonSerializer escapes characters like < and >, so the JSON can't break out of the script tag. *@
+@((MarkupString)$"<script type=\"application/ld+json\">{BuildJson()}</script>")
+
+@code {
+    private string BuildJson()
+    {
+        var openingHours = WorkshopOptions.Value.OpeningHours
+            .OrderBy(day => ((int)day.Key + 6) % 7) // Monday first
+            .Select(day => new Dictionary<string, object>
+            {
+                ["@type"] = "OpeningHoursSpecification",
+                ["dayOfWeek"] = $"https://schema.org/{day.Key}",
+                ["opens"] = day.Value.Open.ToString("HH:mm"),
+                ["closes"] = day.Value.Close.ToString("HH:mm")
+            })
+            .ToList();
+
+        var data = new Dictionary<string, object>
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = "AutoRepair",
+            ["name"] = GarageInfo.Name,
+            ["url"] = Navigation.BaseUri,
+            ["telephone"] = GarageInfo.Phone,
+            ["email"] = GarageInfo.Email,
+            ["address"] = new Dictionary<string, object>
+            {
+                ["@type"] = "PostalAddress",
+                ["streetAddress"] = GarageInfo.Street,
+                ["postalCode"] = GarageInfo.PostalCode,
+                ["addressLocality"] = GarageInfo.City,
+                ["addressCountry"] = "BE"
+            },
+            ["openingHoursSpecification"] = openingHours
+        };
+
+        return JsonSerializer.Serialize(data);
+    }
+}

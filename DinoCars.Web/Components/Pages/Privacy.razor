@@ -1,0 +1,90 @@
+@page "/privacy"
+@using DinoCars.Infrastructure.Data
+@using Microsoft.Extensions.Options
+@inject IOptions<DataRetentionOptions> RetentionOptions
+
+@*
+    Privacy statement (GDPR / AVG).
+    This is a solid starting point, not legal advice: let Dino (or his accountant) check it before launch.
+    TODO before launch:
+      - add the company number (ondernemingsnummer / KBO) under "Wie zijn wij?"
+      - once email sending works, name the email provider under "Met wie delen we uw gegevens?"
+*@
+
+<Seo Title="Privacyverklaring – Dino Cars"
+     Description="Hoe Dino Cars in Alken omgaat met uw persoonsgegevens wanneer u een afspraak maakt." />
+
+<article class="privacy container">
+    <h1>Privacyverklaring</h1>
+    <p class="updated">Laatst bijgewerkt: 24 november 2026</p>
+
+    <p>
+        Bij @GarageInfo.Name gaan we zorgvuldig om met uw persoonsgegevens. Hieronder leest u welke gegevens
+        we verzamelen wanneer u een afspraak maakt, waarom we dat doen en welke rechten u heeft.
+    </p>
+
+    <h2>Wie zijn wij?</h2>
+    <p>
+        @GarageInfo.Name is verantwoordelijk voor de verwerking van uw gegevens.<br />
+        @GarageInfo.Address<br />
+        <a href="mailto:@GarageInfo.Email">@GarageInfo.Email</a> · <a href="@GarageInfo.PhoneLink">@GarageInfo.Phone</a>
+    </p>
+
+    <h2>Welke gegevens verzamelen we?</h2>
+    <ul>
+        <li><strong>Contactgegevens:</strong> voornaam, achternaam, telefoonnummer en (optioneel) e-mailadres.</li>
+        <li><strong>Voertuiggegevens:</strong> merk, model, nummerplaat, kilometerstand en (optioneel) chassisnummer.</li>
+        <li><strong>Afspraakgegevens:</strong> de gekozen diensten, datum en uur, en uw opmerkingen.</li>
+    </ul>
+
+    <h2>Waarom gebruiken we die gegevens?</h2>
+    <p>
+        We gebruiken uw gegevens alleen om uw afspraak in te plannen, uit te voeren en u daarover te contacteren
+        (bijvoorbeeld om een afspraak te bevestigen of te verplaatsen). Dat doen we omdat het nodig is om onze
+        dienstverlening aan u uit te voeren (artikel 6.1.b AVG). We gebruiken uw gegevens niet voor reclame.
+    </p>
+
+    <h2>Hoe lang bewaren we uw gegevens?</h2>
+    <p>
+        We bewaren uw gegevens zolang u klant bij ons bent. Heeft u <strong>@RetentionOptions.Value.RetentionYears jaar</strong>
+        geen afspraak meer gehad, dan worden uw gegevens automatisch verwijderd.
+    </p>
+
+    <h2>Met wie delen we uw gegevens?</h2>
+    <p>
+        We verkopen uw gegevens nooit en geven ze niet door aan derden voor hun eigen doeleinden.
+        Onze website draait bij een hostingprovider met servers in de Europese Unie, die uw gegevens alleen
+        in onze opdracht bewaart.
+    </p>
+    <p>
+        Neemt u contact met ons op via WhatsApp, dan verloopt dat gesprek via WhatsApp (Meta). Daarop is ook
+        het privacybeleid van WhatsApp van toepassing.
+    </p>
+
+    <h2>Cookies</h2>
+    <p>
+        Onze website gebruikt alleen cookies die nodig zijn om de site te laten werken en te beveiligen
+        (bijvoorbeeld voor het inloggen van ons personeel). We gebruiken geen cookies om u te volgen of voor reclame.
+    </p>
+
+    <h2>Uw rechten</h2>
+    <p>U heeft het recht om:</p>
+    <ul>
+        <li>uw gegevens in te kijken;</li>
+        <li>onjuiste gegevens te laten verbeteren;</li>
+        <li>uw gegevens te laten verwijderen;</li>
+        <li>de verwerking te laten beperken of er bezwaar tegen te maken;</li>
+        <li>uw gegevens in een gangbaar formaat te ontvangen.</li>
+    </ul>
+    <p>
+        Stuur hiervoor een e-mail naar <a href="mailto:@GarageInfo.Email">@GarageInfo.Email</a>.
+        We antwoorden binnen een maand.
+    </p>
+
+    <h2>Klacht?</h2>
+    <p>
+        Bent u niet tevreden over hoe we met uw gegevens omgaan, laat het ons dan eerst weten.
+        U kunt ook een klacht indienen bij de Gegevensbeschermingsautoriteit:
+        <a href="https://www.gegevensbeschermingsautoriteit.be" target="_blank" rel="noopener">www.gegevensbeschermingsautoriteit.be</a>.
+    </p>
+</article>

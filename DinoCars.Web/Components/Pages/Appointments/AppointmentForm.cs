@@ -54,5 +54,11 @@ namespace DinoCars.Web.Components.Pages.Appointments
 
         [MaxLength(1000)]
         public string? Notes { get; set; }
+
+        /// <summary>
+        /// Honeypot against spam bots: this field is hidden for real visitors,
+        /// so it should always stay empty. Bots that fill in every field give themselves away.
+        /// </summary>
+        public string? Website { get; set; }
     }
 }

@@ -1,0 +1,42 @@
+/* ===== Privacy statement (mobile first) ===== */
+.privacy {
+    max-width: 760px;
+    padding-top: 1.75rem;
+    padding-bottom: 2.5rem;
+}
+
+.privacy h1 { margin-bottom: .25rem; }
+
+.updated {
+    margin: 0 0 1.5rem;
+    color: var(--muted);
+    font-size: .875rem;
+}
+
+.privacy h2 {
+    margin: 2rem 0 .5rem;
+    font-size: 1.15rem;
+}
+
+.privacy p,
+.privacy li {
+    color: #333;
+    line-height: 1.7;
+}
+
+.privacy ul { padding-left: 1.25rem; }
+.privacy li { margin-bottom: .35rem; }
+
+.privacy a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--yellow);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+/* ===== Tablet and up ===== */
+@media (min-width: 640px) {
+    .privacy { padding-top: 3rem; padding-bottom: 3.5rem; }
+    .privacy h2 { font-size: 1.3rem; }
+}
