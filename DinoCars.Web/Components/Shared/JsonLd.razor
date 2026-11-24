@@ -1,0 +1,12 @@
+@*
+    Renders structured data (JSON-LD) for search engines.
+    Blazor doesn't allow a literal <script> tag in a component, so it's rendered as markup.
+    JsonSerializer escapes characters like < and >, so the data can never break out of the script tag.
+*@
+@using System.Text.Json
+
+@((MarkupString)$"<script type=\"application/ld+json\">{JsonSerializer.Serialize(Data)}</script>")
+
+@code {
+    [Parameter, EditorRequired] public object Data { get; set; } = null!;
+}

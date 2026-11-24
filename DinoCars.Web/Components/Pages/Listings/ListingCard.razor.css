@@ -1,0 +1,82 @@
+/* ===== Car card in the overview (mobile first) ===== */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+
+.photo {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #ecece8;
+}
+
+.photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-photo {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--muted);
+    font-size: .875rem;
+}
+
+.badge {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    padding: .25rem .65rem;
+    border-radius: 999px;
+    background: var(--black);
+    color: var(--yellow);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1rem 1.1rem 1.15rem;
+}
+
+.body h3 {
+    margin: 0 0 .25rem;
+    font-size: 1.05rem;
+    line-height: 1.3;
+}
+
+.summary {
+    margin: 0 0 .9rem;
+    color: var(--muted);
+    font-size: .875rem;
+}
+
+/* Price at the bottom of the card, so prices line up across a row */
+.price {
+    margin: auto 0 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+@media (hover: hover) {
+    .card:hover {
+        border-color: #d4d4d4;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, .07);
+        transform: translateY(-2px);
+    }
+}

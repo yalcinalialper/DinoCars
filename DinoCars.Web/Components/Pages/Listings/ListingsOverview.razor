@@ -1,0 +1,127 @@
+@page "/occasies"
+@using DinoCars.AppLogic.Listings
+@inject IListingCatalog Catalog
+
+@* Static page (no live connection): fast on phones and fully readable by Google.
+   The filters are a normal GET form, so every filtered view has its own shareable URL. *@
+
+<Seo Title="Occasies te koop – Dino Cars, garage in Alken"
+     Description="Bekijk de tweedehandswagens die Dino Cars in Alken te koop aanbiedt. Gecontroleerd door onze eigen garage. Bel of stuur een WhatsApp voor een bezichtiging." />
+
+<section class="listings container">
+    <header class="page-header">
+        <p class="eyebrow">Occasies</p>
+        <h1>Wagens te koop</h1>
+        <p class="lead">Tweedehandswagens, nagekeken in onze eigen garage. Bezichtiging en proefrit op afspraak.</p>
+    </header>
+
+    @if (_hasAnyListings)
+    {
+        <form class="filters" method="get" action="occasies">
+            <label class="field">
+                Merk
+                <select name="merk" onchange="this.form.requestSubmit()">
+                    <option value="">Alle merken</option>
+                    @foreach (var make in _makes)
+                    {
+                        <option value="@make" selected="@(make == _search.Make)">@make</option>
+                    }
+                </select>
+            </label>
+
+            <label class="field">
+                Brandstof
+                <select name="brandstof" onchange="this.form.requestSubmit()">
+                    <option value="">Alle</option>
+                    @foreach (var fuelType in ListingFilterOptions.FuelTypes)
+                    {
+                        <option value="@ListingFilterOptions.FuelValue(fuelType)" selected="@(fuelType == _search.FuelType)">@ListingFormat.FuelLabel(fuelType)</option>
+                    }
+                </select>
+            </label>
+
+            <label class="field">
+                Max. prijs
+                <select name="maxprijs" onchange="this.form.requestSubmit()">
+                    <option value="">Geen maximum</option>
+                    @foreach (var price in ListingFilterOptions.MaxPrices)
+                    {
+                        <option value="@price" selected="@(price == _search.MaxPrice)">@ListingFormat.Price(price)</option>
+                    }
+                </select>
+            </label>
+
+            <label class="field">
+                Sorteren
+                <select name="sorteer" onchange="this.form.requestSubmit()">
+                    @foreach (var sort in ListingFilterOptions.Sorts)
+                    {
+                        <option value="@sort.Value" selected="@(sort.Sort == _search.Sort)">@sort.Label</option>
+                    }
+                </select>
+            </label>
+
+            @* Changing a filter submits automatically; this button is for browsers without JavaScript. *@
+            <noscript><button type="submit" class="btn btn-yellow">Toon resultaten</button></noscript>
+        </form>
+
+        <p class="result-count" aria-live="polite">
+            @(_results.Count == 1 ? "1 wagen" : $"{_results.Count} wagens")
+            @if (IsFiltered)
+            {
+                <a href="occasies">Filters wissen</a>
+            }
+        </p>
+    }
+
+    @if (_results.Count > 0)
+    {
+        <ul class="grid-cards">
+            @foreach (var listing in _results)
+            {
+                <li><ListingCard Listing="listing" /></li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="empty">
+            @if (_hasAnyListings)
+            {
+                <h2>Geen wagens gevonden</h2>
+                <p>Er zijn momenteel geen wagens die aan uw zoekopdracht voldoen. <a href="occasies">Bekijk alle occasies</a>.</p>
+            }
+            else
+            {
+                <h2>Momenteel geen occasies te koop</h2>
+                <p>Op zoek naar een bepaalde wagen? We denken graag met u mee.</p>
+            }
+            <p>
+                Bel ons op <a href="@GarageInfo.PhoneLink">@GarageInfo.Phone</a> of stuur een bericht via
+                <a href="@WhatsAppLink.Create(GarageInfo.Phone, "Hallo Dino Cars, ik ben op zoek naar een wagen.")" target="_blank" rel="noopener">WhatsApp</a>.
+            </p>
+        </div>
+    }
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "merk")] public string? Merk { get; set; }
+    [SupplyParameterFromQuery(Name = "brandstof")] public string? Brandstof { get; set; }
+    [SupplyParameterFromQuery(Name = "maxprijs")] public int? MaxPrijs { get; set; }
+    [SupplyParameterFromQuery(Name = "sorteer")] public string? Sorteer { get; set; }
+
+    private ListingSearch _search = new();
+    private IReadOnlyList<ListingCardView> _results = [];
+    private IReadOnlyList<string> _makes = [];
+    private bool _hasAnyListings;
+
+    private bool IsFiltered => _search.Make is not null || _search.FuelType is not null || _search.MaxPrice is not null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _search = ListingFilterOptions.ToSearch(Merk, Brandstof, MaxPrijs, Sorteer);
+        _makes = await Catalog.GetMakesAsync();
+        _hasAnyListings = _makes.Count > 0;
+        _results = _hasAnyListings ? await Catalog.SearchAsync(_search) : [];
+    }
+}

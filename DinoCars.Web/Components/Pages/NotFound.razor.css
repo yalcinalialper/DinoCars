@@ -1,0 +1,17 @@
+.not-found {
+    max-width: 640px;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.not-found h1 { margin: .35rem 0 .75rem; }
+.not-found p { color: var(--muted); }
+
+.not-found a {
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: var(--yellow);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}

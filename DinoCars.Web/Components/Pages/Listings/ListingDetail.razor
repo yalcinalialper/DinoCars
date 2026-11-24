@@ -1,0 +1,152 @@
+@page "/occasies/{Reference}/{Slug?}"
+@using DinoCars.AppLogic.Listings
+@using DinoCars.Domain.Listings
+@inject IListingCatalog Catalog
+@inject NavigationManager Navigation
+
+@* Static page: fast, and fully readable by Google and by WhatsApp link previews.
+   The gallery is a swipeable strip (CSS scroll snapping), so it needs no JavaScript. *@
+
+@if (_listing is not null)
+{
+    <Seo Title="@($"{_listing.Title} ({_listing.Year}) te koop – Dino Cars Alken")"
+         Description="@MetaDescription"
+         ImageUrl="@_listing.Photos.FirstOrDefault()?.LargeUrl">
+        <ListingSchema Listing="_listing" />
+    </Seo>
+
+    <article class="listing container">
+        <a class="back" href="occasies">← Alle occasies</a>
+
+        <div class="layout">
+            <div class="gallery">
+                @if (_listing.Photos.Count == 0)
+                {
+                    <div class="no-photo">Foto's volgen</div>
+                }
+                else
+                {
+                    <div class="slides" tabindex="0" aria-label="Foto's van de @_listing.Title">
+                        @for (var i = 0; i < _listing.Photos.Count; i++)
+                        {
+                            var photo = _listing.Photos[i];
+                            <figure id="@PhotoAnchor(i)">
+                                <img src="@photo.LargeUrl" alt="@($"{_listing.Title}, foto {i + 1}")"
+                                     width="@photo.Width" height="@photo.Height"
+                                     loading="@(i == 0 ? "eager" : "lazy")" decoding="async" />
+                            </figure>
+                        }
+                    </div>
+
+                    @if (_listing.Photos.Count > 1)
+                    {
+                        <p class="swipe-hint">Swipe voor meer foto's · @_listing.Photos.Count foto's</p>
+
+                        <ol class="thumbs">
+                            @for (var i = 0; i < _listing.Photos.Count; i++)
+                            {
+                                <li>
+                                    <a href="@($"{PageUrl}#{PhotoAnchor(i)}")" aria-label="Toon foto @(i + 1)">
+                                        <img src="@_listing.Photos[i].ThumbnailUrl" alt="" loading="lazy" decoding="async" />
+                                    </a>
+                                </li>
+                            }
+                        </ol>
+                    }
+                }
+            </div>
+
+            <aside class="panel">
+                @if (_listing.Status != ListingStatus.ForSale)
+                {
+                    <span class="status status-@_listing.Status.ToString().ToLowerInvariant()">@ListingFormat.StatusLabel(_listing.Status)</span>
+                }
+
+                <h1>@_listing.Title</h1>
+                <p class="subtitle">@ListingFormat.Summary(_listing.Year, _listing.Mileage, _listing.FuelType, _listing.Transmission)</p>
+                <p class="price">@ListingFormat.Price(_listing.Price)</p>
+
+                @if (_listing.Status == ListingStatus.Sold)
+                {
+                    <div class="sold-note">
+                        <p>Deze wagen is verkocht. Op zoek naar iets gelijkaardigs? Laat het ons weten, dan zoeken we mee.</p>
+                        <a class="btn btn-yellow" href="occasies">Bekijk andere occasies</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="actions">
+                        <a class="btn btn-yellow" href="@GarageInfo.PhoneLink">Bel @GarageInfo.Phone</a>
+                        <a class="btn btn-whatsapp" href="@WhatsAppLink.Create(GarageInfo.Phone, WhatsAppMessage)"
+                           target="_blank" rel="noopener">Stuur een WhatsApp</a>
+                    </div>
+                    <p class="note">Bezichtiging en proefrit op afspraak in onze garage in @GarageInfo.City.</p>
+                }
+
+                <h2>Kenmerken</h2>
+                <dl class="specs">
+                    <dt>Merk</dt><dd>@_listing.Make</dd>
+                    <dt>Model</dt><dd>@_listing.Model</dd>
+                    @if (_listing.Version is not null)
+                    {
+                        <dt>Uitvoering</dt><dd>@_listing.Version</dd>
+                    }
+                    <dt>Bouwjaar</dt><dd>@_listing.Year</dd>
+                    <dt>Kilometerstand</dt><dd>@ListingFormat.Mileage(_listing.Mileage)</dd>
+                    <dt>Brandstof</dt><dd>@ListingFormat.FuelLabel(_listing.FuelType)</dd>
+                    <dt>Versnellingsbak</dt><dd>@ListingFormat.TransmissionLabel(_listing.Transmission)</dd>
+                    @if (_listing.PowerKw is { } powerKw)
+                    {
+                        <dt>Vermogen</dt><dd>@ListingFormat.Power(powerKw)</dd>
+                    }
+                    @if (_listing.Color is not null)
+                    {
+                        <dt>Kleur</dt><dd>@_listing.Color</dd>
+                    }
+                </dl>
+            </aside>
+        </div>
+
+        @if (_listing.Description is not null)
+        {
+            <section class="description">
+                <h2>Omschrijving</h2>
+                <p>@_listing.Description</p>
+            </section>
+        }
+    </article>
+}
+
+@code {
+    [Parameter] public string Reference { get; set; } = "";
+    [Parameter] public string? Slug { get; set; }
+
+    private ListingDetailView? _listing;
+
+    private string PageUrl => ListingFormat.Url(_listing!.Reference, _listing.Slug);
+
+    private string MetaDescription =>
+        $"{_listing!.Title}, {ListingFormat.Summary(_listing.Year, _listing.Mileage, _listing.FuelType, _listing.Transmission)}. " +
+        $"{ListingFormat.Price(_listing.Price)}. Te koop bij {GarageInfo.Name} in {GarageInfo.City}.";
+
+    private string WhatsAppMessage =>
+        $"Hallo {GarageInfo.Name}, ik heb interesse in de {_listing!.Title} ({_listing.Year}, {ListingFormat.Price(_listing.Price)}). " +
+        Navigation.ToAbsoluteUri(PageUrl);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _listing = await Catalog.FindByReferenceAsync(Reference);
+
+        if (_listing is null)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        // Old or incomplete link (e.g. after the title was edited): send visitors and Google to the current URL.
+        if (!string.Equals(Slug, _listing.Slug, StringComparison.Ordinal))
+            Navigation.NavigateTo(PageUrl, replace: true);
+    }
+
+    private static string PhotoAnchor(int index) => $"foto-{index + 1}";
+}

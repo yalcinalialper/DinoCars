@@ -1,0 +1,244 @@
+/* ===== Car detail page (mobile first) ===== */
+.listing {
+    padding-top: 1rem;
+    padding-bottom: 2.5rem;
+}
+
+.back {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    margin-bottom: .25rem;
+    color: var(--muted);
+    font-size: .9rem;
+    text-decoration: none;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr); /* minmax(0, …) stops the photo strip from widening the page */
+    gap: 1.5rem;
+}
+
+/* ----- Gallery: a horizontal strip you can swipe through ----- */
+.slides {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    border-radius: var(--radius);
+    background: #ecece8;
+    scrollbar-width: none; /* hide the scrollbar; swiping and the thumbnails are the controls */
+}
+
+.slides::-webkit-scrollbar { display: none; }
+
+.slides figure {
+    flex: 0 0 100%;
+    margin: 0;
+    aspect-ratio: 4 / 3;
+    scroll-snap-align: start;
+    scroll-margin-top: 5rem; /* a tapped thumbnail scrolls the photo into view below the sticky header */
+}
+
+.slides img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-photo {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    background: #ecece8;
+    color: var(--muted);
+}
+
+.swipe-hint {
+    margin: .5rem 0 0;
+    color: var(--muted);
+    font-size: .8rem;
+    text-align: center;
+}
+
+/* Phones: thumbnails in a row you can scroll sideways */
+.thumbs {
+    display: flex;
+    gap: .5rem;
+    margin: .75rem 0 0;
+    padding: 0;
+    overflow-x: auto;
+    list-style: none;
+    scrollbar-width: none;
+}
+
+.thumbs::-webkit-scrollbar { display: none; }
+
+.thumbs li { flex: 0 0 4.5rem; }
+
+.thumbs a {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    transition: border-color .15s;
+}
+
+.thumbs a:focus-visible { border-color: var(--yellow); outline: none; }
+
+.thumbs img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ----- Info panel ----- */
+.status {
+    display: inline-block;
+    margin-bottom: .6rem;
+    padding: .25rem .7rem;
+    border-radius: 999px;
+    background: var(--black);
+    color: var(--yellow);
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.status-sold { background: #f2f2f2; color: var(--ink); }
+
+.panel h1 {
+    margin: 0 0 .3rem;
+    font-size: 1.6rem;
+    line-height: 1.2;
+}
+
+.subtitle {
+    margin: 0 0 .9rem;
+    color: var(--muted);
+    font-size: .925rem;
+}
+
+.price {
+    margin: 0 0 1.25rem;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Phones: big, full-width buttons for the thumb */
+.actions {
+    display: grid;
+    gap: .6rem;
+}
+
+.btn-whatsapp {
+    border-color: #25d366;
+    background: #25d366;
+    color: #fff;
+}
+
+.note {
+    margin: .75rem 0 0;
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.sold-note {
+    padding: 1rem;
+    border-radius: var(--radius);
+    background: #f6f6f4;
+}
+
+.sold-note p { margin: 0 0 .85rem; }
+
+.panel h2 {
+    margin: 1.75rem 0 .6rem;
+    font-size: 1rem;
+}
+
+.specs {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    margin: 0;
+    border-top: 1px solid var(--border);
+}
+
+.specs dt,
+.specs dd {
+    margin: 0;
+    padding: .6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: .925rem;
+}
+
+.specs dt { padding-right: 1.5rem; color: var(--muted); }
+.specs dd { font-weight: 500; text-align: right; }
+
+/* ----- Description ----- */
+.description {
+    max-width: 720px;
+    margin-top: 2rem;
+}
+
+.description h2 { margin: 0 0 .6rem; font-size: 1.15rem; }
+
+.description p {
+    margin: 0;
+    color: #333;
+    line-height: 1.75;
+    white-space: pre-line; /* keep the line breaks the garage typed */
+}
+
+@media (hover: hover) {
+    .back:hover { color: var(--ink); }
+    .thumbs a:hover { border-color: var(--yellow); }
+    .btn-whatsapp:hover { background: #1ebe5b; border-color: #1ebe5b; color: #fff; }
+}
+
+/* ===== Tablet and up ===== */
+@media (min-width: 640px) {
+    .listing { padding-top: 1.75rem; padding-bottom: 3.5rem; }
+
+    .thumbs li { flex-basis: 5.5rem; }
+
+    .actions { grid-template-columns: 1fr 1fr; }
+
+    .swipe-hint { display: none; }
+}
+
+/* ===== Desktop: gallery left, sticky info panel right ===== */
+@media (min-width: 960px) {
+    .layout {
+        grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    .panel {
+        position: sticky;
+        top: 88px; /* below the sticky header */
+        padding: 1.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+    }
+
+    .panel h1 { font-size: 1.75rem; }
+
+    .actions { grid-template-columns: 1fr; }
+
+    /* Desktop: thumbnails wrap into a grid instead of scrolling */
+    .thumbs {
+        flex-wrap: wrap;
+        overflow: visible;
+    }
+
+    .thumbs li { flex-basis: calc((100% - 2.5rem) / 6); }
+
+    .description { margin-top: 3rem; }
+}
