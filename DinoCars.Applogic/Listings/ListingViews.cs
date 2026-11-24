@@ -52,7 +52,7 @@ namespace DinoCars.AppLogic.Listings
         ListingStatus Status,
         int PhotoCount,
         string? ThumbnailUrl,
-        DateTime UpdatedAtUtc);
+        DateTime UpdatedAtLocal);
 
     /// <summary>A listing as the back-office editor needs it.</summary>
     public sealed record ListingEditView(

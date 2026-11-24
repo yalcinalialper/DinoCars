@@ -1,10 +1,14 @@
+using DinoCars.AppLogic.Availability;
 using DinoCars.Domain.Listings;
+using Microsoft.Extensions.Options;
 
 namespace DinoCars.AppLogic.Listings
 {
     /// <summary>Converts CarListing entities into the read models the UI uses, including photo URLs.</summary>
-    internal sealed class ListingViewMapper(IImageStorage imageStorage)
+    internal sealed class ListingViewMapper(IImageStorage imageStorage, IOptions<WorkshopOptions> options)
     {
+        private readonly TimeZoneInfo _timeZone = TimeZoneInfo.FindSystemTimeZoneById(options.Value.TimeZoneId);
+
         public ListingCardView ToCard(CarListing listing) => new(
             listing.Reference,
             listing.Slug,
@@ -15,7 +19,7 @@ namespace DinoCars.AppLogic.Listings
             listing.FuelType,
             listing.Transmission,
             listing.Status,
-            CoverUrl(listing, thumbnail: true));
+            CoverThumbnailUrl(listing));
 
         public ListingDetailView ToDetail(CarListing listing) => new(
             listing.Reference,
@@ -44,8 +48,8 @@ namespace DinoCars.AppLogic.Listings
             listing.Price,
             listing.Status,
             listing.Photos.Count,
-            CoverUrl(listing, thumbnail: true),
-            listing.UpdatedAtUtc);
+            CoverThumbnailUrl(listing),
+            TimeZoneInfo.ConvertTimeFromUtc(listing.UpdatedAtUtc, _timeZone));
 
         public ListingEditView ToEditView(CarListing listing) => new(
             listing.Id,
@@ -77,18 +81,9 @@ namespace DinoCars.AppLogic.Listings
                     photo.Height))
                 .ToList();
 
-        private string? CoverUrl(CarListing listing, bool thumbnail)
-        {
-            var cover = listing.CoverPhoto;
-
-            if (cover is null)
-                return null;
-
-            var key = thumbnail
-                ? ListingPhotoFiles.Thumbnail(listing.Id, cover.Id)
-                : ListingPhotoFiles.Large(listing.Id, cover.Id);
-
-            return imageStorage.GetPublicUrl(key);
-        }
+        private string? CoverThumbnailUrl(CarListing listing) =>
+            listing.CoverPhoto is { } cover
+                ? imageStorage.GetPublicUrl(ListingPhotoFiles.Thumbnail(listing.Id, cover.Id))
+                : null;
     }
 }

@@ -20,9 +20,6 @@ namespace DinoCars.Infrastructure.Media
         private const int JpegQuality = 82;
         private const string JpegContentType = "image/jpeg";
 
-        // Phone photos are 3–10 MB; refuse anything far bigger before decoding it.
-        private const long MaxUploadBytes = 20 * 1024 * 1024;
-
         // Protects against "decompression bombs": tiny files that decode into gigantic images.
         private const long MaxPixels = 50_000_000;
 
@@ -82,7 +79,7 @@ namespace DinoCars.Infrastructure.Media
 
             while ((bytesRead = await source.ReadAsync(chunk, cancellationToken)) > 0)
             {
-                if (buffer.Length + bytesRead > MaxUploadBytes)
+                if (buffer.Length + bytesRead > ImageLimits.MaxUploadBytes)
                 {
                     await buffer.DisposeAsync();
                     throw new InvalidImageException("The image file is too large.");
@@ -101,6 +98,14 @@ namespace DinoCars.Infrastructure.Media
             image.Metadata.ExifProfile = null;
             image.Metadata.IptcProfile = null;
             image.Metadata.XmpProfile = null;
+
+            // Some formats also keep metadata per frame.
+            foreach (var frame in image.Frames)
+            {
+                frame.Metadata.ExifProfile = null;
+                frame.Metadata.IptcProfile = null;
+                frame.Metadata.XmpProfile = null;
+            }
         }
 
         private static async Task<ImageVariant> EncodeAsync(Image image, int maxSize, CancellationToken cancellationToken)
