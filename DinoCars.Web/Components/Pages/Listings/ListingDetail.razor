@@ -143,9 +143,13 @@
             return;
         }
 
-        // Old or incomplete link (e.g. after the title was edited): send visitors and Google to the current URL.
-        if (!string.Equals(Slug, _listing.Slug, StringComparison.Ordinal))
+        // Old, incomplete or differently-cased link (e.g. after the title was edited):
+        // send visitors and Google to the one current URL.
+        if (!string.Equals(Slug, _listing.Slug, StringComparison.Ordinal) ||
+            !string.Equals(Reference, _listing.Reference, StringComparison.Ordinal))
+        {
             Navigation.NavigateTo(PageUrl, replace: true);
+        }
     }
 
     private static string PhotoAnchor(int index) => $"foto-{index + 1}";

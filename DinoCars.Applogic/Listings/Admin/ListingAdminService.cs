@@ -59,13 +59,13 @@ namespace DinoCars.AppLogic.Listings.Admin
             var image = await ProcessAsync(photo, cancellationToken);
             var listingPhoto = listing.AddPhoto(image.Large.Width, image.Large.Height, clock.UtcNow);
 
-            await imageStorage.SaveAsync(
-                ListingPhotoFiles.Large(listing.Id, listingPhoto.Id), image.Large.Content, image.Large.ContentType, cancellationToken);
-            await imageStorage.SaveAsync(
-                ListingPhotoFiles.Thumbnail(listing.Id, listingPhoto.Id), image.Thumbnail.Content, image.Thumbnail.ContentType, cancellationToken);
-
             try
             {
+                await imageStorage.SaveAsync(
+                    ListingPhotoFiles.Large(listing.Id, listingPhoto.Id), image.Large.Content, image.Large.ContentType, cancellationToken);
+                await imageStorage.SaveAsync(
+                    ListingPhotoFiles.Thumbnail(listing.Id, listingPhoto.Id), image.Thumbnail.Content, image.Thumbnail.ContentType, cancellationToken);
+
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             }
             catch
