@@ -1,0 +1,35 @@
+@using DinoCars.Domain.Listings
+
+@* Current status with a short explanation, and only the buttons that make sense for it. *@
+
+<div class="status-panel">
+    <div class="current">
+        <ListingStatusBadge Status="Status" />
+        <p>@Explanation</p>
+    </div>
+
+    <div class="actions">
+        @foreach (var action in ListingStatusActions.AvailableFor(Status))
+        {
+            <button type="button" class="btn @(ListingStatusActions.IsPrimary(action) ? "btn-yellow" : "btn-ghost")"
+                    disabled="@Disabled" @onclick="() => OnAction.InvokeAsync(action)">
+                @ListingStatusActions.Label(action, Status)
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ListingStatus Status { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback<ListingStatusAction> OnAction { get; set; }
+
+    private string Explanation => Status switch
+    {
+        ListingStatus.Draft => "Nog niet zichtbaar voor klanten. Voeg foto's toe en zet de wagen te koop.",
+        ListingStatus.ForSale => "Zichtbaar op de website.",
+        ListingStatus.Reserved => "Zichtbaar op de website met het label 'Gereserveerd'.",
+        ListingStatus.Sold => "Niet meer in het overzicht; de link toont dat de wagen verkocht is.",
+        _ => ""
+    };
+}

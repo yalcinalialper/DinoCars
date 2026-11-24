@@ -1,0 +1,289 @@
+@page "/beheer/occasies/nieuw"
+@page "/beheer/occasies/{Id:guid}"
+@rendermode InteractiveServer
+@inherits ScopedComponentBase
+@attribute [Authorize(Roles = AppRoles.Staff)]
+@using DinoCars.AppLogic
+@using DinoCars.AppLogic.Listings
+@using DinoCars.AppLogic.Listings.Admin
+@using DinoCars.Domain.Exceptions
+@using DinoCars.Domain.Listings
+@using DinoCars.Infrastructure.Identity
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<Seo Title="@($"{(IsNew ? "Nieuwe occasie" : "Occasie bewerken")} – Dino Cars")" NoIndex="true" />
+
+<section class="container listing-editor">
+    <div class="title-row">
+        <h1>@PageHeading</h1>
+        <a href="beheer/occasies">← Alle occasies</a>
+    </div>
+
+    @if (_notFound)
+    {
+        <div class="error">Deze occasie bestaat niet (meer).</div>
+    }
+    else if (_loaded)
+    {
+        @if (_listing is not null)
+        {
+            <div class="step">
+                <div class="step-header">
+                    <h2>Status</h2>
+                    @if (_listing.Status != ListingStatus.Draft)
+                    {
+                        <a class="public-link" href="@ListingFormat.Url(_listing.Reference, _listing.Slug)" target="_blank" rel="noopener">Bekijk op website ↗</a>
+                    }
+                </div>
+                <ErrorMessage Message="@ErrorFor(EditorSection.Status)" />
+                <ListingStatusPanel Status="_listing.Status" Disabled="_busy" OnAction="ChangeStatusAsync" />
+            </div>
+        }
+
+        <div class="step">
+            <h2><span>1</span> Gegevens</h2>
+            <ErrorMessage Message="@ErrorFor(EditorSection.Details)" />
+            <ListingDetailsForm Model="_form" Busy="_busy" Saved="_saved"
+                                SubmitLabel="@(IsNew ? "Opslaan en foto's toevoegen" : "Gegevens opslaan")"
+                                OnSubmit="SaveDetailsAsync" OnChanged="() => _saved = false" />
+            @if (IsNew)
+            {
+                <p class="hint">De wagen wordt als concept bewaard; klanten zien hem pas als u hem te koop zet.</p>
+            }
+        </div>
+
+        @if (_listing is not null)
+        {
+            <div class="step">
+                <h2><span>2</span> Foto's</h2>
+                <ErrorMessage Message="@ErrorFor(EditorSection.Photos)" />
+                <ListingPhotoManager Photos="_listing.Photos" Busy="_busy" UploadProgress="@_uploadProgress"
+                                     OnUpload="UploadPhotosAsync" OnAction="HandlePhotoActionAsync" />
+            </div>
+
+            <div class="danger-zone">
+                <ErrorMessage Message="@ErrorFor(EditorSection.Delete)" />
+                <button type="button" class="btn btn-danger" disabled="@_busy" @onclick="DeleteAsync">Occasie verwijderen</button>
+                <p class="hint">Verwijdert de wagen en alle foto's definitief. Verkocht? Gebruik liever "Verkocht".</p>
+            </div>
+        }
+    }
+</section>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private enum EditorSection { Status, Details, Photos, Delete }
+
+    private ListingForm _form = new();
+    private ListingEditView? _listing;
+    private bool _loaded;
+    private bool _notFound;
+    private bool _busy;
+    private bool _saved;
+    private string? _uploadProgress;
+    private (EditorSection Section, string Message)? _error;
+
+    private bool IsNew => Id is null;
+
+    private string PageHeading => _listing is null
+        ? "Nieuwe occasie"
+        : $"{_listing.Details.Make} {_listing.Details.Model}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Also runs after "save" on a new listing navigates here with its new id.
+        _error = null;
+        _notFound = false;
+
+        if (Id is { } id)
+        {
+            var isSameListing = _listing?.Id == id;
+            _listing = await LoadAsync(id);
+            _notFound = _listing is null;
+
+            if (_listing is not null && !isSameListing)
+                _form = ListingForm.From(_listing.Details);
+        }
+        else
+        {
+            _listing = null;
+            _form = new ListingForm();
+        }
+
+        _loaded = true;
+    }
+
+    // ----- Details -----
+
+    private async Task SaveDetailsAsync()
+    {
+        var details = _form.ToDetails();
+
+        if (Id is { } id)
+        {
+            if (await TryRunAsync(EditorSection.Details, admin => admin.UpdateDetailsAsync(id, details)))
+            {
+                _saved = true;
+                await ReloadAsync();
+            }
+
+            return;
+        }
+
+        Guid newId = default;
+        if (await TryRunAsync(EditorSection.Details, async admin => newId = await admin.CreateAsync(details)))
+        {
+            _saved = true;
+            Navigation.NavigateTo($"beheer/occasies/{newId}", replace: true);
+        }
+    }
+
+    // ----- Photos -----
+
+    private async Task UploadPhotosAsync(IReadOnlyList<IBrowserFile> files)
+    {
+        var listingId = Id!.Value;
+        var failures = new List<string>();
+
+        _error = null;
+        _saved = false;
+        _busy = true;
+        try
+        {
+            for (var i = 0; i < files.Count; i++)
+            {
+                _uploadProgress = files.Count == 1 ? "Foto uploaden…" : $"Foto {i + 1} van {files.Count} uploaden…";
+                StateHasChanged();
+
+                var failure = await TryUploadAsync(listingId, files[i]);
+                if (failure is not null)
+                    failures.Add($"{files[i].Name}: {failure}");
+
+                // Show each photo as soon as it's ready.
+                await ReloadAsync();
+            }
+        }
+        finally
+        {
+            _uploadProgress = null;
+            _busy = false;
+        }
+
+        if (failures.Count > 0)
+            _error = (EditorSection.Photos, string.Join(" ", failures));
+    }
+
+    /// <summary>Uploads one photo; returns a Dutch error message, or <c>null</c> when it worked.</summary>
+    private async Task<string?> TryUploadAsync(Guid listingId, IBrowserFile file)
+    {
+        try
+        {
+            await using var stream = file.OpenReadStream(ImageLimits.MaxUploadBytes);
+            await RunScopedAsync<IListingAdminService>(admin => admin.AddPhotoAsync(listingId, stream));
+            return null;
+        }
+        catch (DomainException ex)
+        {
+            return ex.Message;
+        }
+        catch (IOException)
+        {
+            // The connection dropped or the file was too large to stream.
+            return "uploaden mislukt. Controleer de verbinding en probeer opnieuw.";
+        }
+    }
+
+    private async Task HandlePhotoActionAsync(PhotoAction action)
+    {
+        var listingId = Id!.Value;
+
+        if (action.Kind == PhotoActionKind.Remove && !await ConfirmAsync("Deze foto verwijderen?"))
+            return;
+
+        await RunAndReloadAsync(EditorSection.Photos, admin => action.Kind switch
+        {
+            PhotoActionKind.MoveLeft => admin.MovePhotoAsync(listingId, action.PhotoId, -1),
+            PhotoActionKind.MoveRight => admin.MovePhotoAsync(listingId, action.PhotoId, 1),
+            PhotoActionKind.MakeCover => admin.SetCoverPhotoAsync(listingId, action.PhotoId),
+            PhotoActionKind.Remove => admin.RemovePhotoAsync(listingId, action.PhotoId),
+            _ => throw new ArgumentOutOfRangeException(nameof(action))
+        });
+    }
+
+    // ----- Status and delete -----
+
+    private async Task ChangeStatusAsync(ListingStatusAction action)
+    {
+        var listingId = Id!.Value;
+
+        var question = ListingStatusActions.Confirmation(action, PageHeading);
+        if (question is not null && !await ConfirmAsync(question))
+            return;
+
+        await RunAndReloadAsync(EditorSection.Status, admin => action switch
+        {
+            ListingStatusAction.Publish => admin.PublishAsync(listingId),
+            ListingStatusAction.Reserve => admin.ReserveAsync(listingId),
+            ListingStatusAction.MarkSold => admin.MarkSoldAsync(listingId),
+            ListingStatusAction.Unpublish => admin.UnpublishAsync(listingId),
+            _ => throw new ArgumentOutOfRangeException(nameof(action))
+        });
+    }
+
+    private async Task DeleteAsync()
+    {
+        var listingId = Id!.Value;
+
+        if (!await ConfirmAsync($"{PageHeading} en alle foto's definitief verwijderen?"))
+            return;
+
+        if (await TryRunAsync(EditorSection.Delete, admin => admin.DeleteAsync(listingId)))
+            Navigation.NavigateTo("beheer/occasies");
+    }
+
+    // ----- Helpers -----
+
+    private Task<ListingEditView?> LoadAsync(Guid id) =>
+        RunScopedAsync<IListingAdminService, ListingEditView?>(admin => admin.FindForEditAsync(id));
+
+    private async Task ReloadAsync()
+    {
+        if (Id is { } id)
+            _listing = await LoadAsync(id) ?? _listing;
+    }
+
+    private async Task RunAndReloadAsync(EditorSection section, Func<IListingAdminService, Task> action)
+    {
+        if (await TryRunAsync(section, action))
+            await ReloadAsync();
+    }
+
+    /// <summary>Runs a back-office action with its own DbContext; domain rule violations are shown in that section.</summary>
+    private async Task<bool> TryRunAsync(EditorSection section, Func<IListingAdminService, Task> action)
+    {
+        _error = null;
+        _saved = false;
+        _busy = true;
+        try
+        {
+            await RunScopedAsync(action);
+            return true;
+        }
+        catch (DomainException ex)
+        {
+            _error = (section, ex.Message);
+            return false;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private string? ErrorFor(EditorSection section) => _error?.Section == section ? _error.Value.Message : null;
+
+    private ValueTask<bool> ConfirmAsync(string question) => JS.InvokeAsync<bool>("confirm", question);
+}

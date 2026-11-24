@@ -103,9 +103,17 @@ h1:focus { outline: none; }
 .btn-yellow { background: var(--yellow); color: var(--black); }
 .btn-outline { border-color: rgba(255, 255, 255, .5); color: #fff; }
 
+/* Light buttons for secondary actions on white backgrounds (back office) */
+.btn-ghost { border-color: #d6d6d6; background: #fff; color: var(--ink); }
+.btn-danger { border-color: #f5c2c0; background: #fff; color: #b42318; }
+
+.btn:disabled { opacity: .6; cursor: default; }
+
 @media (hover: hover) {
     .btn-yellow:hover { background: var(--yellow-hover); color: var(--black); }
     .btn-outline:hover { background: #fff; border-color: #fff; color: var(--black); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--black); }
+    .btn-danger:hover:not(:disabled) { border-color: #b42318; background: #fef3f2; }
 }
 
 /* ===== Forms ===== */

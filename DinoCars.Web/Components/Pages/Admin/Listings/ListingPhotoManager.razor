@@ -1,0 +1,109 @@
+@using DinoCars.AppLogic
+@using DinoCars.AppLogic.Listings
+@using DinoCars.Domain.Listings
+
+@* Upload, order and delete a car's photos. Presentational: the page performs the actions. *@
+
+<div class="photo-manager">
+    @if (RemainingSlots > 0)
+    {
+        <div class="dropzone @(Busy ? "busy" : null)">
+            @* The real file input covers the whole zone (invisible), so tapping and dragging photos onto it both work. *@
+            <InputFile @key="_inputKey" OnChange="HandleSelectionAsync" multiple disabled="@Busy"
+                       accept="@ImageLimits.AcceptedContentTypes" aria-label="Foto's toevoegen" />
+            @if (UploadProgress is not null)
+            {
+                <strong>@UploadProgress</strong>
+                <span>Even geduld, foto's worden verkleind en beveiligd.</span>
+            }
+            else
+            {
+                <strong>+ Foto's toevoegen</strong>
+                <span>Kies foto's op je gsm of computer, of sleep ze hierheen. Nog @RemainingSlots van @CarListing.MaxPhotos.</span>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="hint">Het maximum van @CarListing.MaxPhotos foto's is bereikt.</p>
+    }
+
+    @if (_selectionError is not null)
+    {
+        <div class="error" role="alert">@_selectionError</div>
+    }
+
+    @if (Photos.Count > 0)
+    {
+        <p class="hint">De eerste foto is de hoofdfoto in het overzicht en bij het delen van de link.</p>
+
+        <ol class="photos">
+            @for (var i = 0; i < Photos.Count; i++)
+            {
+                var photo = Photos[i];
+                var isFirst = i == 0;
+                var isLast = i == Photos.Count - 1;
+
+                <li @key="photo.Id">
+                    <div class="thumb">
+                        <img src="@photo.ThumbnailUrl" alt="Foto @(i + 1)" loading="lazy" />
+                        @if (isFirst)
+                        {
+                            <span class="cover-label">Hoofdfoto</span>
+                        }
+                    </div>
+                    <div class="tools">
+                        <button type="button" disabled="@(Busy || isFirst)" aria-label="Foto naar links"
+                                @onclick="() => Raise(photo, PhotoActionKind.MoveLeft)">‹</button>
+                        <button type="button" disabled="@(Busy || isLast)" aria-label="Foto naar rechts"
+                                @onclick="() => Raise(photo, PhotoActionKind.MoveRight)">›</button>
+                        <button type="button" disabled="@(Busy || isFirst)" aria-label="Maak hoofdfoto" title="Maak hoofdfoto"
+                                @onclick="() => Raise(photo, PhotoActionKind.MakeCover)">★</button>
+                        <button type="button" class="remove" disabled="@Busy" aria-label="Foto verwijderen" title="Verwijderen"
+                                @onclick="() => Raise(photo, PhotoActionKind.Remove)">✕</button>
+                    </div>
+                </li>
+            }
+        </ol>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<PhotoView> Photos { get; set; } = [];
+    [Parameter] public bool Busy { get; set; }
+
+    /// <summary>For example "Foto 2 van 5 uploaden…" while an upload is running.</summary>
+    [Parameter] public string? UploadProgress { get; set; }
+
+    [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> OnUpload { get; set; }
+    [Parameter] public EventCallback<PhotoAction> OnAction { get; set; }
+
+    private int _inputKey;
+    private string? _selectionError;
+
+    private int RemainingSlots => CarListing.MaxPhotos - Photos.Count;
+
+    private async Task HandleSelectionAsync(InputFileChangeEventArgs e)
+    {
+        _selectionError = Validate(e);
+
+        if (_selectionError is null)
+            await OnUpload.InvokeAsync(e.GetMultipleFiles(e.FileCount));
+
+        // A fresh input, so picking the same photo again (e.g. after deleting it) still triggers an upload.
+        _inputKey++;
+    }
+
+    private string? Validate(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > RemainingSlots)
+            return $"U kunt nog {RemainingSlots} foto('s) toevoegen; u koos er {e.FileCount}.";
+
+        var tooLarge = e.GetMultipleFiles(e.FileCount).FirstOrDefault(file => file.Size > ImageLimits.MaxUploadBytes);
+        return tooLarge is null
+            ? null
+            : $"{tooLarge.Name} is groter dan {ImageLimits.MaxUploadMegabytes} MB. Kies een kleinere foto.";
+    }
+
+    private Task Raise(PhotoView photo, PhotoActionKind kind) => OnAction.InvokeAsync(new PhotoAction(photo.Id, kind));
+}

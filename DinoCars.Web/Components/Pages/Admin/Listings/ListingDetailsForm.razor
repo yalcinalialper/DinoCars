@@ -1,0 +1,131 @@
+@using DinoCars.Domain.Listings
+@implements IDisposable
+
+@* The car's details. Presentational: the page decides what saving does. *@
+
+<EditForm EditContext="_editContext" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="grid">
+        <label class="field">Merk
+            <InputText @bind-Value="Model.Make" list="common-makes" autocomplete="off" />
+            <ValidationMessage For="() => Model.Make" />
+        </label>
+        <label class="field">Model
+            <InputText @bind-Value="Model.Model" autocomplete="off" />
+            <ValidationMessage For="() => Model.Model" />
+        </label>
+        <label class="field full">Uitvoering (optioneel)
+            <InputText @bind-Value="Model.Version" placeholder="bv. 1.5 TSI Style" autocomplete="off" />
+            <ValidationMessage For="() => Model.Version" />
+        </label>
+
+        <label class="field">Bouwjaar
+            <InputNumber @bind-Value="Model.Year" inputmode="numeric" />
+            <ValidationMessage For="() => Model.Year" />
+        </label>
+        <label class="field">Kilometerstand
+            <InputNumber @bind-Value="Model.Mileage" inputmode="numeric" />
+            <ValidationMessage For="() => Model.Mileage" />
+        </label>
+        <label class="field">Prijs (€)
+            <InputNumber @bind-Value="Model.Price" inputmode="decimal" />
+            <ValidationMessage For="() => Model.Price" />
+        </label>
+        <label class="field">Vermogen in kW (optioneel)
+            <InputNumber @bind-Value="Model.PowerKw" inputmode="numeric" />
+            <ValidationMessage For="() => Model.PowerKw" />
+        </label>
+
+        <label class="field">Brandstof
+            <InputSelect @bind-Value="Model.FuelType">
+                <option value="">Kies…</option>
+                @foreach (var fuelType in Enum.GetValues<FuelType>())
+                {
+                    <option value="@fuelType">@ListingFormat.FuelLabel(fuelType)</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Model.FuelType" />
+        </label>
+        <label class="field">Versnellingsbak
+            <InputSelect @bind-Value="Model.Transmission">
+                <option value="">Kies…</option>
+                @foreach (var transmission in Enum.GetValues<Transmission>())
+                {
+                    <option value="@transmission">@ListingFormat.TransmissionLabel(transmission)</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Model.Transmission" />
+        </label>
+
+        <label class="field full">Kleur (optioneel)
+            <InputText @bind-Value="Model.Color" autocomplete="off" />
+            <ValidationMessage For="() => Model.Color" />
+        </label>
+
+        <label class="field full">Omschrijving (optioneel)
+            <InputTextArea @bind-Value="Model.Description" rows="7"
+                           placeholder="Opties, onderhoudshistoriek, keuring, garantie… Enters blijven behouden op de website." />
+            <ValidationMessage For="() => Model.Description" />
+        </label>
+    </div>
+
+    <datalist id="common-makes">
+        @foreach (var make in CommonMakes)
+        {
+            <option value="@make"></option>
+        }
+    </datalist>
+
+    <div class="submit-row">
+        <button type="submit" class="btn btn-yellow" disabled="@Busy">@SubmitLabel</button>
+        @if (Saved)
+        {
+            <span class="saved" role="status">✓ Opgeslagen</span>
+        }
+    </div>
+</EditForm>
+
+@code {
+    // Suggestions while typing the make; any other make can still be typed.
+    private static readonly string[] CommonMakes =
+    [
+        "Audi", "BMW", "Citroën", "Dacia", "Fiat", "Ford", "Honda", "Hyundai", "Kia", "Mazda",
+        "Mercedes-Benz", "Mini", "Mitsubishi", "Nissan", "Opel", "Peugeot", "Renault", "Seat",
+        "Škoda", "Suzuki", "Tesla", "Toyota", "Volkswagen", "Volvo"
+    ];
+
+    [Parameter, EditorRequired] public ListingForm Model { get; set; } = null!;
+    [Parameter, EditorRequired] public string SubmitLabel { get; set; } = "";
+    [Parameter] public bool Busy { get; set; }
+
+    /// <summary>Shows a short "saved" confirmation next to the button.</summary>
+    [Parameter] public bool Saved { get; set; }
+
+    [Parameter] public EventCallback OnSubmit { get; set; }
+
+    /// <summary>Raised when a field is edited, so the page can hide an earlier "saved" confirmation.</summary>
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private EditContext _editContext = null!;
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_editContext?.Model, Model))
+            return;
+
+        Unsubscribe();
+        _editContext = new EditContext(Model);
+        _editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e) => _ = OnChanged.InvokeAsync();
+
+    private void Unsubscribe()
+    {
+        if (_editContext is not null)
+            _editContext.OnFieldChanged -= HandleFieldChanged;
+    }
+
+    public void Dispose() => Unsubscribe();
+}

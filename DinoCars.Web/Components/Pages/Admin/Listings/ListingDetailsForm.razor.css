@@ -1,0 +1,23 @@
+/* .grid is one column on phones and two from tablet up (app.css); "full" fields span both.
+   The grid gap already spaces them, so drop the extra top margin app.css gives .field.full. */
+.field.full { margin-top: 0; }
+
+.submit-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .5rem;
+    margin-top: 1.25rem;
+}
+
+.saved {
+    color: #116932;
+    font-size: .9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+@media (min-width: 640px) {
+    .submit-row { flex-direction: row; align-items: center; gap: 1rem; }
+    .saved { text-align: left; }
+}
