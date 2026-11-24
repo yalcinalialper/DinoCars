@@ -1,0 +1,30 @@
+@using DinoCars.AppLogic.Listings
+@using DinoCars.Domain.Listings
+
+<a class="card" href="@ListingFormat.Url(Listing.Reference, Listing.Slug)">
+    <div class="photo">
+        @if (Listing.CoverUrl is not null)
+        {
+            <img src="@Listing.CoverUrl" alt="@Listing.Title" loading="lazy" decoding="async" />
+        }
+        else
+        {
+            <span class="no-photo">Foto volgt</span>
+        }
+
+        @if (Listing.Status == ListingStatus.Reserved)
+        {
+            <span class="badge">Gereserveerd</span>
+        }
+    </div>
+
+    <div class="body">
+        <h3>@Listing.Title</h3>
+        <p class="summary">@ListingFormat.Summary(Listing.Year, Listing.Mileage, Listing.FuelType, Listing.Transmission)</p>
+        <p class="price">@ListingFormat.Price(Listing.Price)</p>
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired] public ListingCardView Listing { get; set; } = null!;
+}

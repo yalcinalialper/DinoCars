@@ -4,8 +4,10 @@ using DinoCars.AppLogic.Reservations;
 using DinoCars.Infrastructure;
 using DinoCars.Infrastructure.Data;
 using DinoCars.Infrastructure.Identity;
+using DinoCars.Infrastructure.Media;
 using DinoCars.Web.Components;
 using DinoCars.Web.Components.Account;
+using DinoCars.Web.Endpoints;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -58,7 +60,7 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownNetworks.Clear();
+    options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
 
@@ -99,6 +101,7 @@ else
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 app.UseRateLimiter();
+app.UseMediaFiles();
 
 app.UseAntiforgery();
 
@@ -109,25 +112,8 @@ app.MapRazorComponents<App>()
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
-// SEO: robots.txt tells search engines what not to crawl, the sitemap lists the public pages.
-app.MapGet("/robots.txt", (HttpRequest request) => Results.Text($"""
-    User-agent: *
-    Disallow: /beheer
-    Disallow: /Account
-
-    Sitemap: {request.Scheme}://{request.Host}/sitemap.xml
-    """, "text/plain"));
-
-app.MapGet("/sitemap.xml", (HttpRequest request) =>
-{
-    var baseUrl = $"{request.Scheme}://{request.Host}";
-    string[] publicPages = ["/", "/afspraak", "/privacy"];
-    var urls = string.Concat(publicPages.Select(page => $"<url><loc>{baseUrl}{page}</loc></url>"));
-
-    return Results.Text(
-        $"""<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>""",
-        "application/xml");
-});
+// SEO: robots.txt and sitemap.xml (see Endpoints/SeoEndpoints.cs).
+app.MapSeoEndpoints();
 
 app.Run();
 

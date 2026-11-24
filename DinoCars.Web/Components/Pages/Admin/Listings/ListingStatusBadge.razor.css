@@ -1,0 +1,13 @@
+.badge {
+    display: inline-block;
+    padding: .2rem .65rem;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-draft { background: #f2f2f2; color: var(--ink); }
+.status-forsale { background: #e7f6ec; color: #116932; }
+.status-reserved { background: var(--black); color: var(--yellow); }
+.status-sold { background: #fdecea; color: #9b1c1c; }

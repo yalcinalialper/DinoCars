@@ -1,0 +1,10 @@
+@* A red error box; renders nothing when there is no message. *@
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="error" role="alert">@Message</div>
+}
+
+@code {
+    [Parameter] public string? Message { get; set; }
+}

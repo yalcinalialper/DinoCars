@@ -1,0 +1,65 @@
+@*
+    Structured data (schema.org "Car" with an "Offer"): lets Google understand the car, its price and
+    whether it's still available, and show that in search results.
+*@
+@using DinoCars.AppLogic.Listings
+@using DinoCars.Domain.Listings
+@inject NavigationManager Navigation
+
+<JsonLd Data="BuildData()" />
+
+@code {
+    [Parameter, EditorRequired] public ListingDetailView Listing { get; set; } = null!;
+
+    private Dictionary<string, object> BuildData()
+    {
+        var pageUrl = Navigation.ToAbsoluteUri(ListingFormat.Url(Listing.Reference, Listing.Slug)).ToString();
+
+        var data = new Dictionary<string, object>
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = "Car",
+            ["name"] = Listing.Title,
+            ["url"] = pageUrl,
+            ["brand"] = new Dictionary<string, object> { ["@type"] = "Brand", ["name"] = Listing.Make },
+            ["model"] = Listing.Model,
+            ["vehicleModelDate"] = Listing.Year.ToString(),
+            ["mileageFromOdometer"] = new Dictionary<string, object>
+            {
+                ["@type"] = "QuantitativeValue",
+                ["value"] = Listing.Mileage,
+                ["unitCode"] = "KMT"
+            },
+            ["fuelType"] = ListingFormat.FuelLabel(Listing.FuelType),
+            ["vehicleTransmission"] = ListingFormat.TransmissionLabel(Listing.Transmission),
+            ["image"] = Listing.Photos.Select(photo => Navigation.ToAbsoluteUri(photo.LargeUrl).ToString()).ToList(),
+            ["offers"] = new Dictionary<string, object>
+            {
+                ["@type"] = "Offer",
+                ["price"] = Listing.Price,
+                ["priceCurrency"] = "EUR",
+                ["availability"] = Availability(Listing.Status),
+                ["url"] = pageUrl,
+                ["seller"] = new Dictionary<string, object>
+                {
+                    ["@type"] = "AutoDealer",
+                    ["name"] = GarageInfo.Name,
+                    ["telephone"] = GarageInfo.Phone,
+                    ["address"] = GarageAddress.AsSchema()
+                }
+            }
+        };
+
+        if (Listing.Description is not null)
+            data["description"] = Listing.Description;
+
+        return data;
+    }
+
+    private static string Availability(ListingStatus status) => status switch
+    {
+        ListingStatus.Sold => "https://schema.org/SoldOut",
+        ListingStatus.Reserved => "https://schema.org/LimitedAvailability",
+        _ => "https://schema.org/InStock"
+    };
+}

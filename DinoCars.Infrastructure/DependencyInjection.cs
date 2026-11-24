@@ -1,5 +1,7 @@
 ﻿using DinoCars.AppLogic;
+using DinoCars.AppLogic.Listings;
 using DinoCars.Infrastructure.Data;
+using DinoCars.Infrastructure.Media;
 using DinoCars.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +25,12 @@ namespace DinoCars.Infrastructure
             services.AddScoped<IServiceTypeRepository, ServiceTypeRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
+
+            // Car listings (occasies) and their photos.
+            services.AddScoped<IListingRepository, ListingRepository>();
+            services.Configure<MediaOptions>(configuration.GetSection(MediaOptions.SectionName));
+            services.AddSingleton<IImageStorage, LocalImageStorage>();
+            services.AddSingleton<IImageProcessor, ImageSharpImageProcessor>();
 
             // GDPR: daily clean-up of customer data older than the retention period.
             services.Configure<DataRetentionOptions>(configuration.GetSection(DataRetentionOptions.SectionName));

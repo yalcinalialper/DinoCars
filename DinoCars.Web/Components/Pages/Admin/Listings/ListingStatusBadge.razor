@@ -1,0 +1,7 @@
+@using DinoCars.Domain.Listings
+
+<span class="badge status-@Status.ToString().ToLowerInvariant()">@ListingFormat.StatusLabel(Status)</span>
+
+@code {
+    [Parameter, EditorRequired] public ListingStatus Status { get; set; }
+}

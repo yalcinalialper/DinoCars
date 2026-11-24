@@ -1,0 +1,72 @@
+@page "/beheer/occasies"
+@attribute [Authorize(Roles = AppRoles.Staff)]
+@using System.Globalization
+@using DinoCars.AppLogic.Listings
+@using DinoCars.AppLogic.Listings.Admin
+@using DinoCars.Domain.Listings
+@using DinoCars.Infrastructure.Identity
+@using Microsoft.AspNetCore.Authorization
+@inject IListingAdminService ListingAdmin
+
+@* Static page: just a list of links, no live connection needed. *@
+
+<Seo Title="Occasies beheren – Dino Cars" NoIndex="true" />
+
+<section class="container listings-admin">
+    <div class="title-row">
+        <div>
+            <a class="back" href="beheer">← Beheer</a>
+            <h1>Occasies</h1>
+        </div>
+        <a href="beheer/occasies/nieuw" class="btn btn-yellow">+ Nieuwe occasie</a>
+    </div>
+
+    @if (_rows.Count == 0)
+    {
+        <div class="empty">
+            <h2>Nog geen occasies</h2>
+            <p>Voeg een wagen toe met de gegevens en een paar foto's, en zet hem daarna te koop.</p>
+        </div>
+    }
+    else
+    {
+        <p class="summary">@Summary</p>
+
+        <ul class="rows">
+            @foreach (var row in _rows)
+            {
+                <li>
+                    <a href="@($"beheer/occasies/{row.Id}")">
+                        <div class="thumb">
+                            @if (row.ThumbnailUrl is not null)
+                            {
+                                <img src="@row.ThumbnailUrl" alt="" loading="lazy" />
+                            }
+                        </div>
+                        <div class="info">
+                            <strong>@row.Title</strong>
+                            <span class="meta">@row.Year · @ListingFormat.Price(row.Price) · @PhotoCount(row.PhotoCount)</span>
+                            <span class="meta">Gewijzigd @row.UpdatedAtLocal.ToString("d MMM yyyy", Dutch)</span>
+                        </div>
+                        <ListingStatusBadge Status="row.Status" />
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+</section>
+
+@code {
+    private static readonly CultureInfo Dutch = new("nl-BE");
+
+    private IReadOnlyList<ListingAdminRow> _rows = [];
+
+    private string Summary => string.Join(" · ", _rows
+        .GroupBy(row => row.Status)
+        .OrderBy(group => group.Key)
+        .Select(group => $"{group.Count()} {ListingFormat.StatusLabel(group.Key).ToLowerInvariant()}"));
+
+    protected override async Task OnInitializedAsync() => _rows = await ListingAdmin.GetAllAsync();
+
+    private static string PhotoCount(int count) => count == 1 ? "1 foto" : $"{count} foto's";
+}

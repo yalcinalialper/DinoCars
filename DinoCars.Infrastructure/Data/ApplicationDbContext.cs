@@ -1,4 +1,5 @@
 ﻿using DinoCars.Domain;
+using DinoCars.Domain.Listings;
 using DinoCars.Infrastructure.Data.Converters;
 using DinoCars.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace DinoCars.Infrastructure.Data
         public DbSet<Vehicle> Vehicles => Set<Vehicle>();
         public DbSet<ServiceType> ServiceTypes => Set<ServiceType>();
         public DbSet<Reservation> Reservations => Set<Reservation>();
+        public DbSet<CarListing> CarListings => Set<CarListing>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
