@@ -4,6 +4,7 @@ using DinoCars.AppLogic.Reservations;
 using DinoCars.Infrastructure;
 using DinoCars.Infrastructure.Data;
 using DinoCars.Infrastructure.Identity;
+using DinoCars.Infrastructure.Media;
 using DinoCars.Web.Components;
 using DinoCars.Web.Components.Account;
 using System.Threading.RateLimiting;
@@ -99,6 +100,7 @@ else
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 app.UseRateLimiter();
+app.UseMediaFiles();
 
 app.UseAntiforgery();
 

@@ -13,10 +13,12 @@ namespace DinoCars.Domain.Listings
         public const int MaxPhotos = 20;
         public const int ReferenceLength = 8;
 
-        private const int MaxNameLength = 50;
-        private const int MaxVersionLength = 100;
-        private const int MaxColorLength = 40;
-        private const int MaxDescriptionLength = 4000;
+        // Public so the database mapping uses exactly the same limits.
+        public const int MaxNameLength = 50;
+        public const int MaxVersionLength = 100;
+        public const int MaxColorLength = 40;
+        public const int MaxDescriptionLength = 4000;
+
         private const int MaxMileage = 2_000_000;
         private const decimal MaxPrice = 10_000_000m;
         private const int MaxPowerKw = 2_000;
